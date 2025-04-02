@@ -1,0 +1,594 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9344AB1D2D79221500D924F3 /* JanusSDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9344AB192D7921F100D924F3 /* JanusSDK.xcframework */; };
+		9344AB1E2D79221500D924F3 /* JanusSDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9344AB192D7921F100D924F3 /* JanusSDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		936706732D791BCD0076CF35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9367065A2D791BCC0076CF35 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 936706612D791BCC0076CF35;
+			remoteInfo = JanusExample;
+		};
+		9367067D2D791BCD0076CF35 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9367065A2D791BCC0076CF35 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 936706612D791BCC0076CF35;
+			remoteInfo = JanusExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9344AB1F2D79221500D924F3 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9344AB1E2D79221500D924F3 /* JanusSDK.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9344AB192D7921F100D924F3 /* JanusSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JanusSDK.xcframework; path = ../JanusSDK.xcframework; sourceTree = "<group>"; };
+		936706622D791BCC0076CF35 /* JanusExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JanusExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		936706722D791BCD0076CF35 /* JanusExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JanusExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9367067C2D791BCD0076CF35 /* JanusExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JanusExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		936706642D791BCC0076CF35 /* JanusExample */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JanusExample;
+			sourceTree = "<group>";
+		};
+		936706752D791BCD0076CF35 /* JanusExampleTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JanusExampleTests;
+			sourceTree = "<group>";
+		};
+		9367067F2D791BCD0076CF35 /* JanusExampleUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = JanusExampleUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9367065F2D791BCC0076CF35 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9344AB1D2D79221500D924F3 /* JanusSDK.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9367066F2D791BCD0076CF35 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		936706792D791BCD0076CF35 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9344AB182D7921F000D924F3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9344AB192D7921F100D924F3 /* JanusSDK.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		936706592D791BCC0076CF35 = {
+			isa = PBXGroup;
+			children = (
+				936706642D791BCC0076CF35 /* JanusExample */,
+				936706752D791BCD0076CF35 /* JanusExampleTests */,
+				9367067F2D791BCD0076CF35 /* JanusExampleUITests */,
+				9344AB182D7921F000D924F3 /* Frameworks */,
+				936706632D791BCC0076CF35 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		936706632D791BCC0076CF35 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				936706622D791BCC0076CF35 /* JanusExample.app */,
+				936706722D791BCD0076CF35 /* JanusExampleTests.xctest */,
+				9367067C2D791BCD0076CF35 /* JanusExampleUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		936706612D791BCC0076CF35 /* JanusExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 936706862D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExample" */;
+			buildPhases = (
+				9367065E2D791BCC0076CF35 /* Sources */,
+				9367065F2D791BCC0076CF35 /* Frameworks */,
+				936706602D791BCC0076CF35 /* Resources */,
+				9344AB1F2D79221500D924F3 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				936706642D791BCC0076CF35 /* JanusExample */,
+			);
+			name = JanusExample;
+			packageProductDependencies = (
+			);
+			productName = JanusExample;
+			productReference = 936706622D791BCC0076CF35 /* JanusExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		936706712D791BCD0076CF35 /* JanusExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 936706892D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExampleTests" */;
+			buildPhases = (
+				9367066E2D791BCD0076CF35 /* Sources */,
+				9367066F2D791BCD0076CF35 /* Frameworks */,
+				936706702D791BCD0076CF35 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				936706742D791BCD0076CF35 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				936706752D791BCD0076CF35 /* JanusExampleTests */,
+			);
+			name = JanusExampleTests;
+			packageProductDependencies = (
+			);
+			productName = JanusExampleTests;
+			productReference = 936706722D791BCD0076CF35 /* JanusExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9367067B2D791BCD0076CF35 /* JanusExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9367068C2D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExampleUITests" */;
+			buildPhases = (
+				936706782D791BCD0076CF35 /* Sources */,
+				936706792D791BCD0076CF35 /* Frameworks */,
+				9367067A2D791BCD0076CF35 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9367067E2D791BCD0076CF35 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9367067F2D791BCD0076CF35 /* JanusExampleUITests */,
+			);
+			name = JanusExampleUITests;
+			packageProductDependencies = (
+			);
+			productName = JanusExampleUITests;
+			productReference = 9367067C2D791BCD0076CF35 /* JanusExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9367065A2D791BCC0076CF35 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					936706612D791BCC0076CF35 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					936706712D791BCD0076CF35 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 936706612D791BCC0076CF35;
+					};
+					9367067B2D791BCD0076CF35 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 936706612D791BCC0076CF35;
+					};
+				};
+			};
+			buildConfigurationList = 9367065D2D791BCC0076CF35 /* Build configuration list for PBXProject "JanusExample" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 936706592D791BCC0076CF35;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 936706632D791BCC0076CF35 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				936706612D791BCC0076CF35 /* JanusExample */,
+				936706712D791BCD0076CF35 /* JanusExampleTests */,
+				9367067B2D791BCD0076CF35 /* JanusExampleUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		936706602D791BCC0076CF35 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		936706702D791BCD0076CF35 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9367067A2D791BCD0076CF35 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9367065E2D791BCC0076CF35 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9367066E2D791BCD0076CF35 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		936706782D791BCD0076CF35 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		936706742D791BCD0076CF35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 936706612D791BCC0076CF35 /* JanusExample */;
+			targetProxy = 936706732D791BCD0076CF35 /* PBXContainerItemProxy */;
+		};
+		9367067E2D791BCD0076CF35 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 936706612D791BCC0076CF35 /* JanusExample */;
+			targetProxy = 9367067D2D791BCD0076CF35 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		936706842D791BCD0076CF35 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		936706852D791BCD0076CF35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		936706872D791BCD0076CF35 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"JanusExample/Preview Content\"";
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		936706882D791BCD0076CF35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"JanusExample/Preview Content\"";
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9367068A2D791BCD0076CF35 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JanusExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JanusExample";
+			};
+			name = Debug;
+		};
+		9367068B2D791BCD0076CF35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/JanusExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/JanusExample";
+			};
+			name = Release;
+		};
+		9367068D2D791BCD0076CF35 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = JanusExample;
+			};
+			name = Debug;
+		};
+		9367068E2D791BCD0076CF35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 35W3WAUW9J;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethyca.ios.JanusExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = JanusExample;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9367065D2D791BCC0076CF35 /* Build configuration list for PBXProject "JanusExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				936706842D791BCD0076CF35 /* Debug */,
+				936706852D791BCD0076CF35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		936706862D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				936706872D791BCD0076CF35 /* Debug */,
+				936706882D791BCD0076CF35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		936706892D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9367068A2D791BCD0076CF35 /* Debug */,
+				9367068B2D791BCD0076CF35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9367068C2D791BCD0076CF35 /* Build configuration list for PBXNativeTarget "JanusExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9367068D2D791BCD0076CF35 /* Debug */,
+				9367068E2D791BCD0076CF35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9367065A2D791BCC0076CF35 /* Project object */;
+}

@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+JanusSDK.xcframework/
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/
+DerivedData/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride 
