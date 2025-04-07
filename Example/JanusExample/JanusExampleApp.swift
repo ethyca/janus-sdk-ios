@@ -31,6 +31,8 @@ class JanusManager: ObservableObject {
     @Published var listenerId: String?
     @Published var consentValues: [String: Bool] = [:]
     @Published var consentMetadata: ConsentMetadata = Janus.consentMetadata
+    @Published var fides_string: String = ""
+    @Published var consentMethod: String = ""
     @Published var events: [String] = []
     @Published var isListening: Bool = false
     @Published var isInitializing: Bool = false
@@ -53,6 +55,9 @@ class JanusManager: ObservableObject {
     
     // Track FidesJS consent values for each WebView
     @Published var webViewConsent: [Int: [String: Bool]] = [:]
+    
+    // Track FidesJS fides_string for each WebView
+    @Published var webViewFidesString: [Int: String] = [:]
     
     // Track which WebViews are expanded in the UI
     @Published var expandedWebViews: Set<Int> = []
@@ -77,7 +82,8 @@ class JanusManager: ObservableObject {
             apiHost: config.apiHost,
             propertyId: config.propertyId,
             ipLocation: config.region == nil, // Only use IP location if no region is provided
-            region: config.region
+            region: config.region,
+            webHost: config.website
         )
         
         Janus.initialize(config: janusConfig) { [weak self] success, error in
@@ -104,6 +110,8 @@ class JanusManager: ObservableObject {
         consentValues = Janus.consent
         consentMetadata = Janus.consentMetadata
         hasExperience = Janus.hasExperience
+        fides_string = Janus.fides_string
+        consentMethod = Janus.consentMetadata.consentMethod
     }
     
     func showPrivacyExperience() {
@@ -223,6 +231,7 @@ class JanusManager: ObservableObject {
         
         // Reset consent values
         consentValues.removeAll()
+        fides_string = ""
         
         // Clear events
         events.removeAll()
@@ -257,6 +266,9 @@ class JanusManager: ObservableObject {
         // Initialize empty consent values for this WebView
         webViewConsent[webViewId] = [:]
         
+        // Initialize empty fides_string for this WebView
+        webViewFidesString[webViewId] = ""
+        
         // Create and store a tracker for this WebView
         let tracker = WebViewEventTracker(webView: consentWebView, webViewId: webViewId)
         
@@ -270,6 +282,10 @@ class JanusManager: ObservableObject {
         
         tracker.onConsentValuesChanged = { [weak self] id, consent in
             self?.webViewConsent[id] = consent
+        }
+        
+        tracker.onFidesStringChanged = { [weak self] id, fidesString in
+            self?.webViewFidesString[id] = fidesString
         }
         
         webViewEventTrackers[webViewId] = tracker
@@ -299,6 +315,9 @@ class JanusManager: ObservableObject {
             
             // Remove consent values for this WebView
             webViewConsent.removeValue(forKey: id)
+            
+            // Remove fides_string for this WebView
+            webViewFidesString.removeValue(forKey: id)
             
             // Remove from expanded set if needed
             expandedWebViews.remove(id)
@@ -357,6 +376,7 @@ class JanusManager: ObservableObject {
         webViewEventTrackers.removeAll()
         webViewEvents.removeAll()
         webViewConsent.removeAll()
+        webViewFidesString.removeAll()
         expandedWebViews.removeAll()
         selectedWebViewId = nil
         

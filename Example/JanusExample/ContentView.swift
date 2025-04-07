@@ -190,6 +190,7 @@ struct FullExampleView: View {
     @State private var showWebViewEventLog = false
     @State private var primaryWebViewAutoSync = true
     @State private var backgroundWebViewAutoSync = true
+    @Environment(\.presentationMode) private var presentationMode
     
     var body: some View {
         NavigationView {
@@ -304,6 +305,21 @@ struct FullExampleView: View {
                             Spacer()
                             Text(metadata.updatedAt?.formatted() ?? "Never")
                                 .foregroundColor(.secondary)
+                        }
+                        HStack {
+                            Text("Consent Method")
+                            Spacer()
+                            Text(janusManager.consentMethod.isEmpty ? "unknown" : janusManager.consentMethod)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    if !janusManager.fides_string.isEmpty {
+                        Section(header: Text("Fides String")) {
+                            Text(janusManager.fides_string)
+                                .font(.system(.body, design: .monospaced))
+                                .lineLimit(3)
+                                .truncationMode(.tail)
                         }
                     }
                     
@@ -426,6 +442,21 @@ struct FullExampleView: View {
                                                     .padding(.leading, 16)
                                             }
                                             
+                                            // Show Fides String if available
+                                            if let fidesString = janusManager.webViewFidesString[webViewEntry.id], !fidesString.isEmpty {
+                                                Text("Fides String:")
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                                    .padding(.top, 4)
+                                                    .padding(.leading, 16)
+                                                
+                                                Text(fidesString)
+                                                    .font(.caption.monospaced())
+                                                    .lineLimit(1)
+                                                    .truncationMode(.tail)
+                                                    .padding(.leading, 16)
+                                            }
+                                            
                                             // Refresh button
                                             Button("Refresh Values") {
                                                 janusManager.webViewEventTrackers[webViewEntry.id]?.fetchCurrentConsentValues()
@@ -462,6 +493,10 @@ struct FullExampleView: View {
             }
         }
         .onDisappear {
+            // Only clean up WebViews when the view is actually being dismissed
+            // not when it's temporarily covered by a modal presentation
+            guard !presentationMode.wrappedValue.isPresented else { return }
+            
             // Clean up all background WebViews when the FullExampleView is closed
             janusManager.removeAllBackgroundWebViews()
         }

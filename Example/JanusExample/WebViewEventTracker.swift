@@ -26,11 +26,17 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
     // FidesJS consent values from the WebView
     @Published var fidesConsent: [String: Bool] = [:]
     
+    // FidesJS fides_string from the WebView
+    @Published var fidesString: String = ""
+    
     // Callback to notify parent when event count changes
     var onEventCountChanged: ((Int, Int) -> Void)?
     
     // Callback to notify parent when consent values change
     var onConsentValuesChanged: ((Int, [String: Bool]) -> Void)?
+    
+    // Callback to notify parent when fides_string changes
+    var onFidesStringChanged: ((Int, String) -> Void)?
     
     /// Initialize with a WebView and its ID
     /// - Parameters:
@@ -86,7 +92,10 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
                         if (window.Fides && window.Fides.consent) {
                             window.webkit.messageHandlers.janusEventTracker.postMessage({
                                 type: 'ConsentValues',
-                                data: { consent: window.Fides.consent }
+                                data: { 
+                                    consent: window.Fides.consent,
+                                    fides_string: window.Fides.fides_string || ""
+                                }
                             });
                         }
                     }
@@ -105,10 +114,21 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
     func fetchCurrentConsentValues() {
         let script = """
         (function() {
-            if (window.Fides && window.Fides.consent) {
-                return window.Fides.consent;
+            const result = {
+                consent: {},
+                fides_string: ""
+            };
+            
+            if (window.Fides) {
+                if (window.Fides.consent) {
+                    result.consent = window.Fides.consent;
+                }
+                if (window.Fides.fides_string) {
+                    result.fides_string = window.Fides.fides_string;
+                }
             }
-            return {};
+            
+            return result;
         })();
         """
         
@@ -118,11 +138,19 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
                 return
             }
             
-            if let consentDict = result as? [String: Bool] {
+            if let resultDict = result as? [String: Any],
+               let consentDict = resultDict["consent"] as? [String: Bool] {
                 DispatchQueue.main.async {
                     self?.fidesConsent = consentDict
                     if let id = self?.webViewId {
                         self?.onConsentValuesChanged?(id, consentDict)
+                    }
+                    
+                    if let fidesString = resultDict["fides_string"] as? String {
+                        self?.fidesString = fidesString
+                        if let id = self?.webViewId {
+                            self?.onFidesStringChanged?(id, fidesString)
+                        }
                     }
                 }
             }
@@ -137,12 +165,23 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
             return
         }
         
-        if type == "ConsentValues", let data = body["data"] as? [String: Any], let consent = data["consent"] as? [String: Bool] {
-            // Update consent values
-            DispatchQueue.main.async {
-                self.fidesConsent = consent
-                self.onConsentValuesChanged?(self.webViewId, consent)
+        if type == "ConsentValues", let data = body["data"] as? [String: Any] {
+            // Update consent values if available
+            if let consent = data["consent"] as? [String: Bool] {
+                DispatchQueue.main.async {
+                    self.fidesConsent = consent
+                    self.onConsentValuesChanged?(self.webViewId, consent)
+                }
             }
+            
+            // Update fides_string if available
+            if let fidesString = data["fides_string"] as? String {
+                DispatchQueue.main.async {
+                    self.fidesString = fidesString
+                    self.onFidesStringChanged?(self.webViewId, fidesString)
+                }
+            }
+            
             return
         }
         
@@ -153,6 +192,14 @@ class WebViewEventTracker: NSObject, WKScriptMessageHandler, ObservableObject {
                 DispatchQueue.main.async {
                     self.fidesConsent = consent
                     self.onConsentValuesChanged?(self.webViewId, consent)
+                }
+            }
+            
+            // Check for fides_string in event data
+            if let fidesString = data["fides_string"] as? String {
+                DispatchQueue.main.async {
+                    self.fidesString = fidesString
+                    self.onFidesStringChanged?(self.webViewId, fidesString)
                 }
             }
             

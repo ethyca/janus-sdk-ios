@@ -89,6 +89,7 @@ The main entry point for integrating consent management capabilities is the Janu
 - `ipLocation`: 📍 Use IP-based location detection - defaults to true
 - `region`: ISO-3166-2 region code (overrides location detection if set) - defaults to empty
 - `fidesEvents`: Whether or not to map JanusEvents to FidesJS events in managed Consent WebViews - defaults to true
+- `webHost`: Optional host URL for TCF WebView - required for TCF experiences to work properly
 
 ### Integrations Support
 
@@ -101,7 +102,7 @@ Integrations such as Shopify, GTM, and BlueConic are managed through webviews. E
 When using a WebView created with `createConsentWebView()`, the JanusSDK establishes a bidirectional event binding between your native app and the FidesJS running in the WebView:
 
 1. **Events from JanusSDK to FidesJS:**
-   - When consent values are updated in the native app through `Janus.setConsent()`, the changes are automatically propagated to FidesJS in the WebView.
+   - When consent values are updated in the native app, the changes are automatically propagated to FidesJS in the WebView.
    - FidesJS in the WebView receives these events and updates its own state accordingly, triggering any FidesJS event listeners in the web content.
    - This ensures that web content in your WebViews always reflects the current consent state managed by JanusSDK.
 
