@@ -183,11 +183,6 @@ class JanusManager: ObservableObject {
                 if event is ConsentUpdatedFromWebViewEvent || event is ExperienceSelectionUpdatedEvent {
                     self?.refreshConsentValues()
                 }
-                
-                // Update hasExperience for any event that might affect the privacy experience
-                if event.type == "experienceLoaded" || event.type == "experienceUpdated" {
-                    self?.hasExperience = Janus.hasExperience
-                }
             }
         }
         
