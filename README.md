@@ -9,9 +9,8 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 
 ## Available SDKs & Requirements
 
-- **iOS SDK** (14.0+)
+- **iOS SDK** (13.0+)
 - **Android SDK** (API 21+)
-- **Flutter SDK** (2.0.0+)
 
 ## Key Features
 
@@ -27,9 +26,8 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 
 ## Getting Started
 
-- [iOS Implementation Guide](./iOS/janus-sdk-ios/iOSImplementationGuide.md)
-- Android Implementation Guide
-- Flutter Implementation Guide
+- [iOS Implementation Guide](https://github.com/ethyca/janus-sdk-ios/blob/main/iOSImplementationGuide.md)
+- [Android Implementation Guide](https://github.com/ethyca/janus-sdk-android/blob/main/AndroidImplementationGuide.md)
 
 ## Best Practices
 
