@@ -11,6 +11,7 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 
 - **iOS SDK** (13.0+)
 - **Android SDK** (API 21+)
+- **Flutter SDK** (Flutter 3.3.0+, Dart 3.7.2+, iOS 13.0+, Android API 21+)
 
 ## Key Features
 
@@ -28,6 +29,7 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 
 - [iOS Implementation Guide](https://github.com/ethyca/janus-sdk-ios/blob/main/iOSImplementationGuide.md)
 - [Android Implementation Guide](https://github.com/ethyca/janus-sdk-android/blob/main/AndroidImplementationGuide.md)
+- [Flutter Implementation Guide](https://github.com/ethyca/janus-sdk-flutter/blob/main/FlutterImplementationGuide.md)
 
 ## Best Practices
 
@@ -79,7 +81,9 @@ The main entry point for integrating consent management capabilities is the Janu
 - `consentMetadata`: An object containing metadata about the consent, including:
   - `createdAt`: A timestamp indicating when the consent was created.
   - `updatedAt`: A timestamp indicating when the consent was last updated.
+  - `consentMethod`: A string indicating how the consent was provided (e.g., "save", "dismiss").
 - `fides_string`: The user's current consent string(s) combined into a single value.
+- `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
 
 **Janus Configuration Options
 - `apiHost`:  🌎 Fides base URL
@@ -87,7 +91,6 @@ The main entry point for integrating consent management capabilities is the Janu
 - `ipLocation`: 📍 Use IP-based location detection - defaults to true
 - `region`: ISO-3166-2 region code (overrides location detection if set) - defaults to empty
 - `fidesEvents`: Whether or not to map JanusEvents to FidesJS events in managed Consent WebViews - defaults to true
-- `webHost`: Optional host URL for TCF WebView - required for TCF experiences to work properly
 
 ### Integrations Support
 

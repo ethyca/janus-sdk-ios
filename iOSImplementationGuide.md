@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.6")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.7")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.6'
+  pod 'JanusSDK', '1.0.7'
 end
 ```
 
@@ -93,12 +93,11 @@ Janus.initialize(config: config) { success, error in
 ```swift
 // Configure Janus with required credentials and settings
 let config = JanusConfiguration(
-    apiHost: "https://privacy-center.yourhost.com",     // 🌎 Fides base URL
+    apiHost: "https://privacy-center.yourhost.com",     // 🌎 Your privacy center base URL
     propertyId: "FDS-A0B1C2",                           // 🏢 Property identifier for this app
     ipLocation: true,                                   // 📍 Use IP-based geolocation
     region: "US-CA",                                    // 🌎 Provide if geolocation is false or fails
-    fidesEvents: true,                                  // 🔄 Map JanusEvents to FidesJS events in WebViews
-    webHost: "https://yourhost.com"                     // 🇪🇺 Base site where you have an existing fides.js installation up and running - required for TCF (optional for non-TCF)
+    fidesEvents: true                                   // 🔄 Map JanusEvents to FidesJS events in WebViews
 )
 ```
 
