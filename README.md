@@ -12,6 +12,7 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 - **iOS SDK** (13.0+)
 - **Android SDK** (API 21+)
 - **Flutter SDK** (Flutter 3.3.0+, Dart 3.7.2+, iOS 13.0+, Android API 21+)
+- **Fides Privacy Center** (2.59.1+)
 
 ## Key Features
 
@@ -73,6 +74,8 @@ The main entry point for integrating consent management capabilities is the Janu
 - `hasExperience`: True when there is an experience available for the current region and propertyId.
 - `shouldShowExperience`: A boolean indicating whether the privacy experience should be shown to the user. Returns true if a valid experience exists and the users consent is not present or not valid.
 - `showExperience()`: Display the consent management interface to the user if `hasExperience` is true.
+- `getLocationByIPAddress(callback)`: Performs IP-based location detection and provides the resulting location data through the callback.
+- `region`: Returns the region code currently being used by the SDK after initialization.
 - `listenerId = addConsentEventListener(listener)`: Attaches to events emitted during key user interactions.
 - `removeConsentEventListener(listenerId)`: Removes an event listener.
 - `createConsentWebView()`: Creates a platform-specific webview that synchronizes consent state with your mobile application as well as bidirectional support of Events with FidesJS.
@@ -86,11 +89,13 @@ The main entry point for integrating consent management capabilities is the Janu
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
 
 **Janus Configuration Options
-- `apiHost`:  🌎 Fides base URL
-- `propertyId`:  🏢 Property identifier for this app (i.e. "FDS-A0B1C2")
+- `apiHost`:  🌎 Fides base URL (REQUIRED)
+- `propertyId`:  🏢 Property identifier for this app (i.e. "FDS-A0B1C2") - defaults to empty
 - `ipLocation`: 📍 Use IP-based location detection - defaults to true
 - `region`: ISO-3166-2 region code (overrides location detection if set) - defaults to empty
 - `fidesEvents`: Whether or not to map JanusEvents to FidesJS events in managed Consent WebViews - defaults to true
+
+> **Note:** For full TCF support, the JanusSDK requires a minimum version of 2.59.1 for the Fides privacy-center image
 
 ### Integrations Support
 
@@ -155,7 +160,7 @@ When a user interacts with FidesJS in a WebView created with `createConsentWebVi
 
 If `fidesEvents` is set to true in the configuration (defaults to true), when events are dispatched by the JanusSDK in the native app, they fire these corresponding FidesJS events in active WebViews created with `createConsentWebView()`:
 
-| JanusEvent Type              | Mapped to FidesJS Event    | 
+| JanusEvent Type              | Mapped to FidesJS Event    |
 |------------------------------|----------------------------|
 | `experienceShown`            | `FidesUIShown`             |
 | `experienceInteraction`      | `FidesUIChanged`           |
@@ -187,7 +192,7 @@ The SDK provides detailed error types via `JanusError`:
 - `authenticationFailed`: Provided during initialization on the callback if API credentials are invalid
 - `apiError`: Provided during initialization on the callback, or thrown as an exception when the API returns an error
 - `invalidRegion`: Provided during initialization on the callback if an unsupported region code is provided
-- `invalidExperience`: Provided during initialization on the callback if experience data is invalid or missing 
+- `invalidExperience`: Provided during initialization on the callback if experience data is invalid or missing
 - `noRegionProvided`: Provided during initialization on the callback if no region is provided and IP location detection fails or is disabled
 
 These errors are returned through the initialization callback's error parameter, which should be checked and handled appropriately.

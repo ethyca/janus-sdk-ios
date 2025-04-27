@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.7")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.8")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.7'
+  pod 'JanusSDK', '1.0.8'
 end
 ```
 
@@ -153,6 +153,50 @@ let consent = Janus.consent
 // List of IAB strings like CPzHq4APzHq4AAMABBENAUEAALAAAEOAAAAAAEAEACACAAAA,1~61.70
 let fides_string = Janus.fides_string
 ```
+
+### Region Detection and Access
+
+JanusSDK provides methods to work directly with region detection and access the current region:
+
+```swift
+// Get the user's region by IP geolocation
+Janus.getLocationByIPAddress { success, locationData, error in
+    if success, let locationData = locationData {
+        // Use the full location data
+        let isoRegion = locationData.location // Format: "US-CA"
+        let country = locationData.country    // Format: "US"
+        let subRegion = locationData.region   // Format: "CA"
+        let ipAddress = locationData.ip       // Format: "192.168.1.1"
+        
+        // Update UI with region information
+        updateRegionUI(region: isoRegion ?? "")
+    } else if let error = error {
+        // Handle specific errors
+        switch error {
+        case let networkError as APIError.networkError:
+            showNetworkError(networkError)
+        case JanusError.invalidRegion:
+            showLocationDetectionFailed()
+        default:
+            showGenericError()
+        }
+    }
+}
+
+// Access the current region being used by the SDK (after initialization)
+let currentRegion = Janus.region
+regionLabel.text = "Current Region: \(currentRegion)"
+```
+
+The `getLocationByIPAddress` method is particularly useful when:
+- You want to show region information to users before showing a privacy experience
+- You need to implement custom region selection UI based on detected region
+- You want to give users the option to correct their detected region
+
+The `region` property returns the region code that the SDK is currently using, which may come from:
+- The region specified in the configuration during initialization
+- The region detected via IP geolocation
+- Empty string if no region has been determined yet
 
 ### WKWebView Integration
 
