@@ -28,6 +28,7 @@ struct JanusExampleApp: App {
 class JanusManager: ObservableObject {
     @Published var isInitialized: Bool = false
     @Published var initializationError: String?
+    @Published var initializationErrorType: JanusError?
     @Published var listenerId: String?
     @Published var consentValues: [String: Bool] = [:]
     @Published var consentMetadata: ConsentMetadata = Janus.consentMetadata
@@ -36,6 +37,8 @@ class JanusManager: ObservableObject {
     @Published var events: [String] = []
     @Published var isListening: Bool = false
     @Published var isInitializing: Bool = false
+    @Published var currentRegion: String = ""
+    @Published var ipLocationDetails: [String: String] = [:]
     
     // Add hasExperience property
     @Published var hasExperience: Bool = false
@@ -76,26 +79,139 @@ class JanusManager: ObservableObject {
         isInitializing = true
         isInitialized = false
         initializationError = nil
+        initializationErrorType = nil
         hasExperience = false
+        currentRegion = ""
+        ipLocationDetails.removeAll()
         
         let janusConfig = JanusConfiguration(
             apiHost: config.apiHost,
             propertyId: config.propertyId,
             ipLocation: config.region == nil, // Only use IP location if no region is provided
-            region: config.region,
-            webHost: config.website
+            region: config.region
         )
         
-        Janus.initialize(config: janusConfig) { [weak self] success, error in
-            DispatchQueue.main.async {
+        Janus.initialize(config: janusConfig, completion: { [weak self] success, error in
+            let workItem = DispatchWorkItem {
                 self?.isInitializing = false
                 self?.isInitialized = success
+                
                 if let error = error {
+                    // Store the error description for display
                     self?.initializationError = error.localizedDescription
+                    
+                    // Store the JanusError type if available for specific error handling
+                    if let janusError = error as? JanusError {
+                        self?.initializationErrorType = janusError
+                        
+                        // Log specific error types using if/else conditions instead of switch
+                        if case .noRegionProvidedIPLocationFailed(let locationData) = janusError {
+                            print("IP Location detection failed. Partial data: \(String(describing: locationData))")
+                            if let locationData = locationData {
+                                self?.storeIPLocationDetails(locationData)
+                            }
+                        } else if case .noRegionProvidedIPLocationFalse = janusError {
+                            print("No region provided and IP location disabled")
+                        } else if case .ipLocationFailed(let locationData) = janusError {
+                            print("IP Location API failed. Partial data: \(String(describing: locationData))")
+                            if let locationData = locationData {
+                                self?.storeIPLocationDetails(locationData)
+                            }
+                        } else {
+                            print("Other Janus error: \(janusError.localizedDescription)")
+                        }
+                    } else {
+                        print("Non-Janus error: \(error.localizedDescription)")
+                    }
                 } else if success {
                     self?.refreshConsentValues()
                     self?.addEventListeners()
                     self?.hasExperience = Janus.hasExperience
+                    self?.currentRegion = Janus.region
+                }
+            }
+            DispatchQueue.main.async(execute: workItem)
+        })
+    }
+    
+    // Store IP location details in a structured format for display
+    private func storeIPLocationDetails(_ location: IPLocationResponse) {
+        if let country = location.country {
+            ipLocationDetails["Country"] = country
+        }
+        if let region = location.region {
+            ipLocationDetails["Region"] = region
+        }
+        if let location = location.location {
+            ipLocationDetails["Location"] = location
+        }
+        if let ip = location.ip {
+            ipLocationDetails["IP"] = ip
+        }
+    }
+    
+    // Directly test the getLocationByIPAddress method
+    func testIPLocationDetection() {
+        // Set initializing state without clearing any previously fetched data
+        isInitializing = true
+        
+        Janus.getLocationByIPAddress { [weak self] success, locationData, error in
+            // Prepare all updates first before dispatching to main thread
+            // to minimize UI flashing
+            var updatedRegion = ""
+            var updatedDetails = [String: String]()
+            var updatedError: String? = nil
+            
+            if success, let locationData = locationData {
+                // Store the location details
+                if let country = locationData.country {
+                    updatedDetails["Country"] = country
+                }
+                if let region = locationData.region {
+                    updatedDetails["Region"] = region
+                }
+                if let location = locationData.location {
+                    updatedDetails["Location"] = location
+                    updatedRegion = location
+                }
+                if let ip = locationData.ip {
+                    updatedDetails["IP"] = ip
+                }
+            } else if let error = error {
+                updatedError = error.localizedDescription
+                if let janusError = error as? JanusError, case .ipLocationFailed(let locationData) = janusError {
+                    if let locationData = locationData {
+                        if let country = locationData.country {
+                            updatedDetails["Country"] = country
+                        }
+                        if let region = locationData.region {
+                            updatedDetails["Region"] = region
+                        }
+                        if let location = locationData.location {
+                            updatedDetails["Location"] = location
+                        }
+                        if let ip = locationData.ip {
+                            updatedDetails["IP"] = ip
+                        }
+                    }
+                }
+            }
+            
+            // Update all UI state at once to avoid flashing
+            DispatchQueue.main.async {
+                self?.isInitializing = false
+                
+                // Only update these if we have data to show
+                if !updatedRegion.isEmpty {
+                    self?.currentRegion = updatedRegion
+                }
+                
+                if !updatedDetails.isEmpty {
+                    self?.ipLocationDetails = updatedDetails
+                }
+                
+                if let error = updatedError {
+                    self?.initializationError = error
                 }
             }
         }
@@ -407,5 +523,29 @@ class JanusManager: ObservableObject {
         } catch {
             print("Error encoding experience: \(error)")
         }
+    }
+    
+    // Update the region and reinitialize Janus
+    func updateRegion(newRegion: String) {
+        guard var config = self.config else { return }
+        
+        // Update the region
+        config.region = newRegion
+        self.config = config
+        
+        // Clear all states immediately before reinitializing
+        // This ensures the UI is updated immediately
+        DispatchQueue.main.async { [weak self] in
+            self?.isInitializing = true
+            self?.isInitialized = false
+            self?.initializationError = nil
+            self?.initializationErrorType = nil
+            self?.hasExperience = false
+            self?.currentRegion = newRegion
+            self?.ipLocationDetails.removeAll()
+        }
+        
+        // Reinitialize Janus with the new region
+        setupJanus()
     }
 }
