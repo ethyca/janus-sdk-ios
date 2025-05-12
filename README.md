@@ -89,7 +89,8 @@ The main entry point for integrating consent management capabilities is the Janu
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
 
 **Janus Configuration Options
-- `apiHost`:  🌎 Fides base URL (REQUIRED)
+- `apiHost`:  🌎 FidesPlus API server base URL (REQUIRED)
+- `privacyCenterHost`: 🏢 Privacy Center host URL - defaults to empty, if not provided Janus will assume the privacy center is hosted on the FidesPlus API server (apiHost)
 - `propertyId`:  🏢 Property identifier for this app (i.e. "FDS-A0B1C2") - defaults to empty
 - `ipLocation`: 📍 Use IP-based location detection - defaults to true
 - `region`: ISO-3166-2 region code (overrides location detection if set) - defaults to empty

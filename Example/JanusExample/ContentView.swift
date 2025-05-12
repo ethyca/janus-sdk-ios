@@ -24,6 +24,7 @@ enum ConfigurationType: String, CaseIterable {
 struct JanusConfig {
     var type: ConfigurationType = .ethyca
     var apiHost: String = "https://privacy.ethyca.com"
+    var privacyCenterHost: String = ""
     var website: String = "https://ethyca.com"
     var propertyId: String? = "FDS-KSB4MF"
     var region: String? = nil
@@ -36,6 +37,7 @@ struct JanusConfig {
             return JanusConfig(
                 type: .ethycaEmpty,
                 apiHost: "https://privacy.ethyca.com",
+                privacyCenterHost: "",
                 website: "https://ethyca.com",
                 propertyId: nil,
                 region: nil
@@ -44,6 +46,7 @@ struct JanusConfig {
             return JanusConfig(
                 type: .cookieHouse,
                 apiHost: "https://privacy-plus-rc.fides-staging.ethyca.com/",
+                privacyCenterHost: "",
                 website: "https://cookiehouse-plus-rc.fides-staging.ethyca.com",
                 propertyId: nil,
                 region: nil
@@ -52,6 +55,7 @@ struct JanusConfig {
             return JanusConfig(
                 type: .cookieHouseNightly,
                 apiHost: "https://privacy-plus-nightly.fides-staging.ethyca.com/",
+                privacyCenterHost: "",
                 website: "https://cookiehouse-plus-nightly.fides-staging.ethyca.com",
                 propertyId: nil,
                 region: nil
@@ -61,12 +65,13 @@ struct JanusConfig {
                 return JanusConfig(
                     type: .custom,
                     apiHost: saved["apiHost"] ?? "",
+                    privacyCenterHost: saved["privacyCenterHost"] ?? "",
                     website: saved["website"] ?? "",
                     propertyId: saved["propertyId"]?.isEmpty == true ? nil : saved["propertyId"],
                     region: saved["region"]?.isEmpty == true ? nil : saved["region"]
                 )
             }
-            return JanusConfig(type: .custom, apiHost: "", website: "", propertyId: nil, region: nil)
+            return JanusConfig(type: .custom, apiHost: "", privacyCenterHost: "", website: "", propertyId: nil, region: nil)
         }
     }
 
@@ -74,6 +79,7 @@ struct JanusConfig {
         if type == .custom {
             UserDefaults.standard.set([
                 "apiHost": apiHost,
+                "privacyCenterHost": privacyCenterHost,
                 "website": website,
                 "propertyId": propertyId ?? "",
                 "region": region ?? ""
@@ -121,6 +127,7 @@ struct ContentView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 ConfigField(label: "API Host", value: $config.apiHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
+                ConfigField(label: "Privacy Center Host", value: $config.privacyCenterHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
                 ConfigField(label: "Website", value: $config.website, isEnabled: config.type == .custom, placeholder: "https://example.com")
                 ConfigField(label: "Property ID (Optional)", value: Binding(
                     get: { config.propertyId ?? "" },

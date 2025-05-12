@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.9")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.10")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.9'
+  pod 'JanusSDK', '1.0.10'
 end
 ```
 
@@ -55,6 +55,7 @@ Janus.initialize(config: config) { success, error in
             presentRegionSelector { selectedRegion in
                 let newConfig = JanusConfiguration(
                     apiHost: config.apiHost,
+                    privacyCenterHost: config.privacyCenterHost,
                     propertyId: config.propertyId,
                     ipLocation: false,
                     region: selectedRegion
@@ -93,11 +94,12 @@ Janus.initialize(config: config) { success, error in
 ```swift
 // Configure Janus with required credentials and settings
 let config = JanusConfiguration(
-    apiHost: "https://privacy-center.yourhost.com",     // 🌎 Your privacy center base URL
-    propertyId: "FDS-A0B1C2",                           // 🏢 Property identifier for this app
-    ipLocation: true,                                   // 📍 Use IP-based geolocation
-    region: "US-CA",                                    // 🌎 Provide if geolocation is false or fails
-    fidesEvents: true                                   // 🔄 Map JanusEvents to FidesJS events in WebViews
+    apiHost: "https://privacy-plus.yourhost.com",             // 🌎 FidesPlus API server base URL (REQUIRED)
+    privacyCenterHost: "https://privacy-center.yourhost.com", // 🏢 Privacy Center host URL - if not provided, Janus will use the apiHost
+    propertyId: "FDS-A0B1C2",                                 // 🏢 Property identifier for this app
+    ipLocation: true,                                         // 📍 Use IP-based geolocation
+    region: "US-CA",                                          // 🌎 Provide if geolocation is false or fails
+    fidesEvents: true                                         // 🔄 Map JanusEvents to FidesJS events in WebViews
 )
 ```
 
