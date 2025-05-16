@@ -89,7 +89,9 @@ class JanusManager: ObservableObject {
             privacyCenterHost: config.privacyCenterHost,
             propertyId: config.propertyId ?? "",
             ipLocation: config.region == nil, // Only use IP location if no region is provided
-            region: config.region ?? ""
+            region: config.region ?? "",
+            fidesEvents: true,
+            autoShowExperience: config.autoShowExperience
         )
         
         Janus.initialize(config: janusConfig, completion: { [weak self] success, error in

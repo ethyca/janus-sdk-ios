@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.10")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.11")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.10'
+  pod 'JanusSDK', '1.0.11'
 end
 ```
 
@@ -97,9 +97,10 @@ let config = JanusConfiguration(
     apiHost: "https://privacy-plus.yourhost.com",             // 🌎 FidesPlus API server base URL (REQUIRED)
     privacyCenterHost: "https://privacy-center.yourhost.com", // 🏢 Privacy Center host URL - if not provided, Janus will use the apiHost
     propertyId: "FDS-A0B1C2",                                 // 🏢 Property identifier for this app
-    ipLocation: true,                                         // 📍 Use IP-based geolocation
+    ipLocation: true,                                         // 📍 Use IP-based geolocation (default true)
     region: "US-CA",                                          // 🌎 Provide if geolocation is false or fails
-    fidesEvents: true                                         // 🔄 Map JanusEvents to FidesJS events in WebViews
+    fidesEvents: true,                                        // 🔄 Map JanusEvents to FidesJS events in WebViews (default true)
+    autoShowExperience: true                                  // 🚀 Automatically show privacy experience after initialization (default true)
 )
 ```
 
@@ -154,6 +155,50 @@ let consent = Janus.consent
 
 // List of IAB strings like CPzHq4APzHq4AAMABBENAUEAALAAAEOAAAAAAEAEACACAAAA,1~61.70
 let fides_string = Janus.fides_string
+```
+
+### Controlling Privacy Experience Display
+
+By default, Janus will automatically show the privacy experience after successful initialization if `shouldShowExperience` returns true. You can control this behavior with the `autoShowExperience` configuration parameter.
+
+#### Option 1: Automatic display (default)
+
+```swift
+// With autoShowExperience set to true (default), Janus will automatically
+// show the privacy experience after initialization if shouldShowExperience is true
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    // Other parameters...
+    autoShowExperience: true // Default behavior
+)
+```
+
+#### Option 2: Manual control
+
+```swift
+// Disable automatic display by setting autoShowExperience to false
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    // Other parameters...
+    autoShowExperience: false // Prevent automatic display
+)
+
+// Initialize Janus without showing the privacy experience immediately
+Janus.initialize(config: config) { success, error in
+    if success {
+        // You can now decide when to show the experience
+        
+        // Check if the experience should be shown (based on consent status, etc.)
+        if Janus.shouldShowExperience {
+            // Show at the appropriate time in your app flow
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                if let rootVC = UIApplication.shared.windows.first?.rootViewController {
+                    Janus.showExperience(from: rootVC)
+                }
+            }
+        }
+    }
+}
 ```
 
 ### Region Detection and Access

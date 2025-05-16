@@ -28,6 +28,7 @@ struct JanusConfig {
     var website: String = "https://ethyca.com"
     var propertyId: String? = "FDS-KSB4MF"
     var region: String? = nil
+    var autoShowExperience: Bool = true
 
     static func forType(_ type: ConfigurationType) -> JanusConfig {
         switch type {
@@ -40,7 +41,8 @@ struct JanusConfig {
                 privacyCenterHost: "",
                 website: "https://ethyca.com",
                 propertyId: nil,
-                region: nil
+                region: nil,
+                autoShowExperience: true
             )
         case .cookieHouse:
             return JanusConfig(
@@ -49,7 +51,8 @@ struct JanusConfig {
                 privacyCenterHost: "",
                 website: "https://cookiehouse-plus-rc.fides-staging.ethyca.com",
                 propertyId: nil,
-                region: nil
+                region: nil,
+                autoShowExperience: true
             )
         case .cookieHouseNightly:
             return JanusConfig(
@@ -58,20 +61,22 @@ struct JanusConfig {
                 privacyCenterHost: "",
                 website: "https://cookiehouse-plus-nightly.fides-staging.ethyca.com",
                 propertyId: nil,
-                region: nil
+                region: nil,
+                autoShowExperience: true
             )
         case .custom:
-            if let saved = UserDefaults.standard.object(forKey: "CustomJanusConfig") as? [String: String] {
+            if let saved = UserDefaults.standard.object(forKey: "CustomJanusConfig") as? [String: Any] {
                 return JanusConfig(
                     type: .custom,
-                    apiHost: saved["apiHost"] ?? "",
-                    privacyCenterHost: saved["privacyCenterHost"] ?? "",
-                    website: saved["website"] ?? "",
-                    propertyId: saved["propertyId"]?.isEmpty == true ? nil : saved["propertyId"],
-                    region: saved["region"]?.isEmpty == true ? nil : saved["region"]
+                    apiHost: saved["apiHost"] as? String ?? "",
+                    privacyCenterHost: saved["privacyCenterHost"] as? String ?? "",
+                    website: saved["website"] as? String ?? "",
+                    propertyId: (saved["propertyId"] as? String)?.isEmpty == true ? nil : (saved["propertyId"] as? String),
+                    region: (saved["region"] as? String)?.isEmpty == true ? nil : (saved["region"] as? String),
+                    autoShowExperience: saved["autoShowExperience"] as? Bool ?? true
                 )
             }
-            return JanusConfig(type: .custom, apiHost: "", privacyCenterHost: "", website: "", propertyId: nil, region: nil)
+            return JanusConfig(type: .custom, apiHost: "", privacyCenterHost: "", website: "", propertyId: nil, region: nil, autoShowExperience: true)
         }
     }
 
@@ -82,7 +87,8 @@ struct JanusConfig {
                 "privacyCenterHost": privacyCenterHost,
                 "website": website,
                 "propertyId": propertyId ?? "",
-                "region": region ?? ""
+                "region": region ?? "",
+                "autoShowExperience": autoShowExperience
             ], forKey: "CustomJanusConfig")
         }
     }
@@ -120,8 +126,8 @@ struct ContentView: View {
                     Text(type.rawValue).tag(type)
                 }
             }
-            .onChange(of: config.type) { oldType, newType in
-                print("Config type changed from \(oldType) to \(newType)")
+            .onChange(of: config.type) { newType in
+                print("Config type changed to \(newType)")
                 config = JanusConfig.forType(newType)
             }
 
@@ -137,6 +143,9 @@ struct ContentView: View {
                     get: { config.region ?? "" },
                     set: { config.region = $0.isEmpty ? nil : $0 }
                 ), isEnabled: true, placeholder: "Leave empty to use IP location")
+                
+                Toggle("Auto-Show Experience", isOn: $config.autoShowExperience)
+                    .padding(.vertical, 4)
             }
             .padding(.vertical, 20)
 
