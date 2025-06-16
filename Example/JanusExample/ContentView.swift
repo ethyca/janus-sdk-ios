@@ -94,12 +94,19 @@ struct JanusConfig {
     }
 }
 
+enum PresentationStyle: String, CaseIterable {
+    case fullScreen = "Full Screen"
+    case sheet = "Sheet"
+}
+
 struct ContentView: View {
     @EnvironmentObject var janusManager: JanusManager
     @State private var showFullExample = false
+    @State private var showFullExampleSheet = false
     @State private var config = JanusConfig()
     @State private var selectedRegion = "US-CA"
     @State private var regionInput = ""
+    @State private var presentationStyle: PresentationStyle = .fullScreen
 
     var isLaunchEnabled: Bool {
         if config.type == .custom {
@@ -146,13 +153,33 @@ struct ContentView: View {
                 
                 Toggle("Auto-Show Experience", isOn: $config.autoShowExperience)
                     .padding(.vertical, 4)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Presentation Style")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Picker("Presentation Style", selection: $presentationStyle) {
+                        ForEach(PresentationStyle.allCases, id: \.self) { style in
+                            Text(style.rawValue).tag(style)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+                .padding(.vertical, 4)
             }
             .padding(.vertical, 20)
 
             Button(action: {
                 config.save()
                 janusManager.setConfig(config)
-                showFullExample = true
+                
+                switch presentationStyle {
+                case .fullScreen:
+                    showFullExample = true
+                case .sheet:
+                    showFullExampleSheet = true
+                }
             }) {
                 Text("Launch Full Example")
                     .font(.headline)
@@ -180,7 +207,11 @@ struct ContentView: View {
                 .cornerRadius(10)
             }
             .padding(.horizontal, 40)
-            .sheet(isPresented: $showFullExample) {
+            .fullScreenCover(isPresented: $showFullExample) {
+                FullExampleView()
+                    .environmentObject(janusManager)
+            }
+            .sheet(isPresented: $showFullExampleSheet) {
                 FullExampleView()
                     .environmentObject(janusManager)
             }
