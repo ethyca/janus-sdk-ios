@@ -87,6 +87,15 @@ The main entry point for integrating consent management capabilities is the Janu
   - `consentMethod`: A string indicating how the consent was provided (e.g., "save", "dismiss").
 - `fides_string`: The user's current consent string(s) combined into a single value.
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
+- `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). If used, setLogger should be called prior to initialize, in order to obtain logs during init.
+
+**Janus Logger Interface:**
+A protocol/interface for implementing custom logging functionality. Custom loggers must implement:
+- `log(level, message, metadata, error)`: Main logging method that receives:
+  - `level`: Log level (verbose, debug, info, warn, error)
+  - `message`: The log message string
+  - `metadata`: Optional key-value pairs for additional context (constrained to `[String: String]`)
+  - `error`: Optional error object for error-level logs (Throwable on Android, Error on iOS)
 
 **Janus Configuration Options:**
 - `apiHost`:  🌎 FidesPlus API server base URL (REQUIRED)

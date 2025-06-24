@@ -284,6 +284,13 @@ struct FullExampleView: View {
                         }
 
                         HStack {
+                            Text("Should Show Experience:")
+                            Spacer()
+                            Text(janusManager.shouldShowExperience ? "Yes ✅" : "No ❌")
+                                .foregroundColor(janusManager.shouldShowExperience ? .green : .red)
+                        }
+
+                        HStack {
                             Text("Region:")
                             Spacer()
                             Text(janusManager.currentRegion.isEmpty ? "Not set" : janusManager.currentRegion)

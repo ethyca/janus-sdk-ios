@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.15")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.16")
 ]
 ```
 
@@ -19,8 +19,49 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.15'
+  pod 'JanusSDK', '1.0.16'
 end
+```
+
+### Custom Logging
+
+The Janus SDK supports custom logging implementations through the `JanusLogger` protocol. This is useful for debugging, monitoring, and integrating with your app's existing logging infrastructure.
+
+#### JanusLogger Protocol
+
+```swift
+protocol JanusLogger {
+    func log(
+        level: JanusLogLevel,
+        message: String,
+        metadata: [String: String]?,
+        error: Error?
+    )
+}
+
+enum JanusLogLevel {
+    case verbose, debug, info, warn, error
+}
+```
+
+#### Setting a Custom Logger
+
+If you have implemented your own custom logger implementation, be sure to call setLogger() prior to initialize() in order to receive logs that occur during the initialization of the SDK.
+
+```swift
+// Set custom logger BEFORE initializing Janus
+let myCustomLogger = MyCustomJanusLogger()
+Janus.setLogger(myCustomLogger)
+
+// Now initialize Janus - logs during initialization will use your custom logger
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    propertyId: "FDS-A0B1C2"
+)
+
+Janus.initialize(config: config) { success, error in
+    // Handle initialization result
+}
 ```
 
 ### Initialization

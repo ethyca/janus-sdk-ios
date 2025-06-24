@@ -43,6 +43,9 @@ class JanusManager: ObservableObject {
     // Add hasExperience property
     @Published var hasExperience: Bool = false
     
+    // Add shouldShowExperience property
+    @Published var shouldShowExperience: Bool = false
+    
     // Configuration
     private var config: JanusConfig?
     
@@ -75,6 +78,17 @@ class JanusManager: ObservableObject {
     
     func setupJanus() {
         guard let config = config else { return }
+        
+        // Initialize HTTPLogger and set it before Janus initialization
+        // SAMPLE implementation/usage of a custom HTTP logger
+        // can be used in conjunction with logdy for local logging
+        // logdy --no-analytics -p 8181 --api-key foobar
+        let httpLogger = HTTPLogger(
+            endpoint: "http://localhost:8181/api/log",
+            authToken: "foobar",
+            source: "iOSExampleApp"
+        )
+        Janus.setLogger(httpLogger)
         
         isInitializing = true
         isInitialized = false
@@ -130,6 +144,7 @@ class JanusManager: ObservableObject {
                     self?.refreshConsentValues()
                     self?.addEventListeners()
                     self?.hasExperience = Janus.hasExperience
+                    self?.shouldShowExperience = Janus.shouldShowExperience
                     self?.currentRegion = Janus.region
                 }
             }
