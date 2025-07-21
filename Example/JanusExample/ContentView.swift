@@ -16,6 +16,8 @@ import Foundation // This is imported so we don't need to add it explicitly else
 enum ConfigurationType: String, CaseIterable {
     case ethyca = "Ethyca"
     case ethycaEmpty = "Ethyca (Empty)"
+    case localSlim = "Local Slim"
+    case localDemo = "Local Demo"
     case cookieHouse = "Cookie House (RC)"
     case cookieHouseNightly = "Cookie House (Nightly)"
     case custom = "Custom"
@@ -41,6 +43,26 @@ struct JanusConfig {
                 privacyCenterHost: "",
                 website: "https://ethyca.com",
                 propertyId: nil,
+                region: nil,
+                autoShowExperience: true
+            )
+        case .localSlim:
+            return JanusConfig(
+                type: .localSlim,
+                apiHost: "http://localhost:3000",
+                privacyCenterHost: "http://localhost:3001",
+                website: "http://localhost:3001",
+                propertyId: nil,
+                region: nil,
+                autoShowExperience: true
+            )
+        case .localDemo:
+            return JanusConfig(
+                type: .localDemo,
+                apiHost: "http://localhost:8080",
+                privacyCenterHost: "http://localhost:3001",
+                website: "http://localhost:3000",
+                propertyId: "FDS-DY5EAX",
                 region: nil,
                 autoShowExperience: true
             )
@@ -145,7 +167,7 @@ struct ContentView: View {
                 ConfigField(label: "Property ID (Optional)", value: Binding(
                     get: { config.propertyId ?? "" },
                     set: { config.propertyId = $0.isEmpty ? nil : $0 }
-                ), isEnabled: config.type == .custom, placeholder: "EX-AMPLE123")
+                ), isEnabled: true, placeholder: "EX-AMPLE123")
                 ConfigField(label: "Region (Optional)", value: Binding(
                     get: { config.region ?? "" },
                     set: { config.region = $0.isEmpty ? nil : $0 }

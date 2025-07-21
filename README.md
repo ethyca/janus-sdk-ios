@@ -104,6 +104,9 @@ A protocol/interface for implementing custom logging functionality. Custom logge
 - `ipLocation`: 📍 Use IP-based location detection - defaults to true
 - `region`: ISO-3166-2 region code (overrides location detection if set) - defaults to empty
 - `fidesEvents`: Whether or not to map JanusEvents to FidesJS events in managed Consent WebViews - defaults to true
+- `autoShowExperience`: 🚀 Automatically show privacy experience after initialization if shouldShowExperience is true - defaults to true
+- `saveUserPreferencesToFides`: 💾 Save user preferences to Fides via privacy-preferences API - defaults to true
+- `saveNoticesServedToFides`: 💾 Save notices served to Fides via notices-served API - defaults to true
 
 > **Note:** For full TCF support, the JanusSDK requires a minimum version of 2.59.1 for the Fides privacy-center image
 

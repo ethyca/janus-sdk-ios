@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.17")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.18")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.17'
+  pod 'JanusSDK', '1.0.18'
 end
 ```
 
@@ -141,7 +141,9 @@ let config = JanusConfiguration(
     ipLocation: true,                                         // 📍 Use IP-based geolocation (default true)
     region: "US-CA",                                          // 🌎 Provide if geolocation is false or fails
     fidesEvents: true,                                        // 🔄 Map JanusEvents to FidesJS events in WebViews (default true)
-    autoShowExperience: true                                  // 🚀 Automatically show privacy experience after initialization (default true)
+    autoShowExperience: true,                                 // 🚀 Automatically show privacy experience after initialization (default true)
+    saveUserPreferencesToFides: true                          // 💾 Save user preferences to Fides via privacy-preferences API (default true)
+    saveNoticesServedToFides: true                            // 💾 Save notices served to Fides via notices-served API (default true)
 )
 ```
 
