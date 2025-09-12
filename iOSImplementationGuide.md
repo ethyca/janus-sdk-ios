@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.18")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.19")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.18'
+  pod 'JanusSDK', '1.0.19'
 end
 ```
 
@@ -99,7 +99,9 @@ Janus.initialize(config: config) { success, error in
                     privacyCenterHost: config.privacyCenterHost,
                     propertyId: config.propertyId,
                     ipLocation: false,
-                    region: selectedRegion
+                    region: selectedRegion,
+                    consentFlagType: config.consentFlagType,
+                    consentNonApplicableFlagMode: config.consentNonApplicableFlagMode
                 )
                 Janus.initialize(config: newConfig) { /* handle result */ }
             }
@@ -142,8 +144,10 @@ let config = JanusConfiguration(
     region: "US-CA",                                          // 🌎 Provide if geolocation is false or fails
     fidesEvents: true,                                        // 🔄 Map JanusEvents to FidesJS events in WebViews (default true)
     autoShowExperience: true,                                 // 🚀 Automatically show privacy experience after initialization (default true)
-    saveUserPreferencesToFides: true                          // 💾 Save user preferences to Fides via privacy-preferences API (default true)
-    saveNoticesServedToFides: true                            // 💾 Save notices served to Fides via notices-served API (default true)
+    saveUserPreferencesToFides: true,                         // 💾 Save user preferences to Fides via privacy-preferences API (default true)
+    saveNoticesServedToFides: true,                           // 💾 Save notices served to Fides via notices-served API (default true)
+    consentFlagType: .boolean,                                // 🎯 Format for consent values (default boolean)
+    consentNonApplicableFlagMode: .omit                       // 🔄 Handle non-applicable notices (default omit)
 )
 ```
 
@@ -212,7 +216,9 @@ By default, Janus will automatically show the privacy experience after successfu
 let config = JanusConfiguration(
     apiHost: "https://privacy-plus.yourhost.com",
     // Other parameters...
-    autoShowExperience: true // Default behavior
+    autoShowExperience: true, // Default behavior
+    consentFlagType: .boolean,
+    consentNonApplicableFlagMode: .omit
 )
 ```
 
@@ -223,7 +229,9 @@ let config = JanusConfiguration(
 let config = JanusConfiguration(
     apiHost: "https://privacy-plus.yourhost.com",
     // Other parameters...
-    autoShowExperience: false // Prevent automatic display
+    autoShowExperience: false, // Prevent automatic display
+    consentFlagType: .boolean,
+    consentNonApplicableFlagMode: .omit
 )
 
 // Initialize Janus without showing the privacy experience immediately

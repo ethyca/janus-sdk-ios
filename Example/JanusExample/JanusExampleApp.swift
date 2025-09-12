@@ -30,7 +30,7 @@ class JanusManager: ObservableObject {
     @Published var initializationError: String?
     @Published var initializationErrorType: JanusError?
     @Published var listenerId: String?
-    @Published var consentValues: [String: Bool] = [:]
+    @Published var consentValues: [String: Any] = [:]
     @Published var consentMetadata: ConsentMetadata = Janus.consentMetadata
     @Published var fides_string: String = ""
     @Published var consentMethod: String = ""
@@ -105,7 +105,9 @@ class JanusManager: ObservableObject {
             ipLocation: config.region == nil, // Only use IP location if no region is provided
             region: config.region ?? "",
             fidesEvents: true,
-            autoShowExperience: config.autoShowExperience
+            autoShowExperience: config.autoShowExperience,
+            consentFlagType: config.consentFlagType,
+            consentNonApplicableFlagMode: config.consentNonApplicableFlagMode
         )
         
         Janus.initialize(config: janusConfig, completion: { [weak self] success, error in
@@ -279,37 +281,29 @@ class JanusManager: ObservableObject {
                 
                 // WebView events
                 if let uiChangedEvent = event as? WebViewFidesUIChangedEvent {
-                    if let interaction = Mirror(reflecting: uiChangedEvent).children.first(where: { $0.label == "interaction" })?.value as? [String: Bool] {
-                        let dataString = interaction.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
-                        eventDescription += "\nData: \(dataString)"
-                    }
+                    let interaction = uiChangedEvent.interaction
+                    let dataString = interaction.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+                    eventDescription += "\nData: \(dataString)"
                 } else if let updatingEvent = event as? WebViewFidesUpdatingEvent {
-                    if let consentIntended = Mirror(reflecting: updatingEvent).children.first(where: { $0.label == "consentIntended" })?.value as? [String: Bool] {
-                        let dataString = consentIntended.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
-                        eventDescription += "\nData: \(dataString)"
-                    }
+                    let consentIntended = updatingEvent.consentIntended
+                    let dataString = consentIntended.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+                    eventDescription += "\nData: \(dataString)"
                 } else if let initializedEvent = event as? WebViewFidesInitializedEvent {
                     eventDescription += "\nData: shouldShowExperience: \(initializedEvent.shouldShowExperience)"
                 } else if let modalClosedEvent = event as? WebViewFidesModalClosedEvent {
-                    if let consentMethod = Mirror(reflecting: modalClosedEvent).children.first(where: { $0.label == "consentMethod" })?.value as? String {
-                        eventDescription += "\nData: consentMethod: \(consentMethod)"
-                    }
+                    eventDescription += "\nData: consentMethod: \(modalClosedEvent.consentMethod)"
                 } 
                 // Standard experience events
                 else if let interactionEvent = event as? ExperienceInteractionEvent {
-                    if let interaction = Mirror(reflecting: interactionEvent).children.first(where: { $0.label == "interaction" })?.value as? [String: Bool] {
-                        let dataString = interaction.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
-                        eventDescription += "\nData: \(dataString)"
-                    }
+                    let interaction = interactionEvent.interaction
+                    let dataString = interaction.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+                    eventDescription += "\nData: \(dataString)"
                 } else if let closedEvent = event as? ExperienceClosedEvent {
-                    if let closeMethod = Mirror(reflecting: closedEvent).children.first(where: { $0.label == "closeMethod" })?.value as? String {
-                        eventDescription += "\nData: closeMethod: \(closeMethod)"
-                    }
+                    eventDescription += "\nData: closeMethod: \(closedEvent.closeMethod)"
                 } else if let updatingEvent = event as? ExperienceSelectionUpdatingEvent {
-                    if let consentIntended = Mirror(reflecting: updatingEvent).children.first(where: { $0.label == "consentIntended" })?.value as? [String: Bool] {
-                        let dataString = consentIntended.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
-                        eventDescription += "\nData: \(dataString)"
-                    }
+                    let consentIntended = updatingEvent.consentIntended
+                    let dataString = consentIntended.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+                    eventDescription += "\nData: \(dataString)"
                 }
                 
                 self?.events.append(eventDescription)

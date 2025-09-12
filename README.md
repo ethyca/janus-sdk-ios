@@ -107,6 +107,8 @@ A protocol/interface for implementing custom logging functionality. Custom logge
 - `autoShowExperience`: 🚀 Automatically show privacy experience after initialization if shouldShowExperience is true - defaults to true
 - `saveUserPreferencesToFides`: 💾 Save user preferences to Fides via privacy-preferences API - defaults to true
 - `saveNoticesServedToFides`: 💾 Save notices served to Fides via notices-served API - defaults to true
+- `consentFlagType`: 🎯 The format for consent values returned by external interfaces - defaults to boolean (options: "boolean", "consentMechanism")
+- `consentNonApplicableFlagMode`: 🔄 Controls how non-applicable privacy notices are handled in consent objects - defaults to omit (options: "omit", "include")
 
 > **Note:** For full TCF support, the JanusSDK requires a minimum version of 2.59.1 for the Fides privacy-center image
 

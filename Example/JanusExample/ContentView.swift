@@ -31,6 +31,8 @@ struct JanusConfig {
     var propertyId: String? = "FDS-KSB4MF"
     var region: String? = nil
     var autoShowExperience: Bool = true
+    var consentFlagType: ConsentFlagType = .boolean
+    var consentNonApplicableFlagMode: ConsentNonApplicableFlagMode = .omit
 
     static func forType(_ type: ConfigurationType) -> JanusConfig {
         switch type {
@@ -44,7 +46,9 @@ struct JanusConfig {
                 website: "https://ethyca.com",
                 propertyId: nil,
                 region: nil,
-                autoShowExperience: true
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
             )
         case .localSlim:
             return JanusConfig(
@@ -54,7 +58,9 @@ struct JanusConfig {
                 website: "http://localhost:3001",
                 propertyId: nil,
                 region: nil,
-                autoShowExperience: true
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
             )
         case .localDemo:
             return JanusConfig(
@@ -64,7 +70,9 @@ struct JanusConfig {
                 website: "http://localhost:3000",
                 propertyId: "FDS-DY5EAX",
                 region: nil,
-                autoShowExperience: true
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
             )
         case .cookieHouse:
             return JanusConfig(
@@ -74,7 +82,9 @@ struct JanusConfig {
                 website: "https://cookiehouse-plus-rc.fides-staging.ethyca.com",
                 propertyId: nil,
                 region: nil,
-                autoShowExperience: true
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
             )
         case .cookieHouseNightly:
             return JanusConfig(
@@ -84,10 +94,16 @@ struct JanusConfig {
                 website: "https://cookiehouse-plus-nightly.fides-staging.ethyca.com",
                 propertyId: nil,
                 region: nil,
-                autoShowExperience: true
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
             )
         case .custom:
             if let saved = UserDefaults.standard.object(forKey: "CustomJanusConfig") as? [String: Any] {
+                let consentFlagTypeString = saved["consentFlagType"] as? String ?? "boolean"
+                let consentFlagType = ConsentFlagType(rawValue: consentFlagTypeString) ?? .boolean
+                let consentNonApplicableFlagModeString = saved["consentNonApplicableFlagMode"] as? String ?? "omit"
+                let consentNonApplicableFlagMode = ConsentNonApplicableFlagMode(rawValue: consentNonApplicableFlagModeString) ?? .omit
                 return JanusConfig(
                     type: .custom,
                     apiHost: saved["apiHost"] as? String ?? "",
@@ -95,10 +111,12 @@ struct JanusConfig {
                     website: saved["website"] as? String ?? "",
                     propertyId: (saved["propertyId"] as? String)?.isEmpty == true ? nil : (saved["propertyId"] as? String),
                     region: (saved["region"] as? String)?.isEmpty == true ? nil : (saved["region"] as? String),
-                    autoShowExperience: saved["autoShowExperience"] as? Bool ?? true
+                    autoShowExperience: saved["autoShowExperience"] as? Bool ?? true,
+                    consentFlagType: consentFlagType,
+                    consentNonApplicableFlagMode: consentNonApplicableFlagMode
                 )
             }
-            return JanusConfig(type: .custom, apiHost: "", privacyCenterHost: "", website: "", propertyId: nil, region: nil, autoShowExperience: true)
+            return JanusConfig(type: .custom, apiHost: "", privacyCenterHost: "", website: "", propertyId: nil, region: nil, autoShowExperience: true, consentFlagType: .boolean, consentNonApplicableFlagMode: .omit)
         }
     }
 
@@ -110,7 +128,9 @@ struct JanusConfig {
                 "website": website,
                 "propertyId": propertyId ?? "",
                 "region": region ?? "",
-                "autoShowExperience": autoShowExperience
+                "autoShowExperience": autoShowExperience,
+                "consentFlagType": consentFlagType.rawValue,
+                "consentNonApplicableFlagMode": consentNonApplicableFlagMode.rawValue
             ], forKey: "CustomJanusConfig")
         }
     }
@@ -138,109 +158,141 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "shield.checkerboard")
-                .imageScale(.large)
-                .font(.system(size: 60))
-                .foregroundStyle(.blue)
-                .padding(.bottom, 8)
+        ScrollView {
+            VStack(spacing: 12) {
+                Image(systemName: "shield.checkerboard")
+                    .imageScale(.large)
+                    .font(.system(size: 60))
+                    .foregroundStyle(.blue)
+                    .padding(.bottom, 8)
 
-            Text("Janus SDK Example")
-                .font(.title)
-                .fontWeight(.bold)
-                .padding(.bottom, 20)
+                Text("Janus SDK Example")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding(.bottom, 20)
 
-            Picker("Configuration", selection: $config.type) {
-                ForEach(ConfigurationType.allCases, id: \.self) { type in
-                    Text(type.rawValue).tag(type)
-                }
-            }
-            .onChange(of: config.type) { newType in
-                print("Config type changed to \(newType)")
-                config = JanusConfig.forType(newType)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                ConfigField(label: "API Host", value: $config.apiHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
-                ConfigField(label: "Privacy Center Host", value: $config.privacyCenterHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
-                ConfigField(label: "Website", value: $config.website, isEnabled: config.type == .custom, placeholder: "https://example.com")
-                ConfigField(label: "Property ID (Optional)", value: Binding(
-                    get: { config.propertyId ?? "" },
-                    set: { config.propertyId = $0.isEmpty ? nil : $0 }
-                ), isEnabled: true, placeholder: "EX-AMPLE123")
-                ConfigField(label: "Region (Optional)", value: Binding(
-                    get: { config.region ?? "" },
-                    set: { config.region = $0.isEmpty ? nil : $0 }
-                ), isEnabled: true, placeholder: "Leave empty to use IP location")
-                
-                Toggle("Auto-Show Experience", isOn: $config.autoShowExperience)
-                    .padding(.vertical, 4)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Presentation Style")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    Picker("Presentation Style", selection: $presentationStyle) {
-                        ForEach(PresentationStyle.allCases, id: \.self) { style in
-                            Text(style.rawValue).tag(style)
-                        }
+                Picker("Configuration", selection: $config.type) {
+                    ForEach(ConfigurationType.allCases, id: \.self) { type in
+                        Text(type.rawValue).tag(type)
                     }
-                    .pickerStyle(MenuPickerStyle())
                 }
-                .padding(.vertical, 4)
-            }
-            .padding(.vertical, 20)
+                .onChange(of: config.type) { newType in
+                    print("Config type changed to \(newType)")
+                    config = JanusConfig.forType(newType)
+                }
 
-            Button(action: {
-                config.save()
-                janusManager.setConfig(config)
-                
-                switch presentationStyle {
-                case .fullScreen:
-                    showFullExample = true
-                case .sheet:
-                    showFullExampleSheet = true
+                VStack(alignment: .leading, spacing: 8) {
+                    ConfigField(label: "API Host", value: $config.apiHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
+                    ConfigField(label: "Privacy Center Host", value: $config.privacyCenterHost, isEnabled: config.type == .custom, placeholder: "https://privacy-center.example.com")
+                    ConfigField(label: "Website", value: $config.website, isEnabled: config.type == .custom, placeholder: "https://example.com")
+                    ConfigField(label: "Property ID (Optional)", value: Binding(
+                        get: { config.propertyId ?? "" },
+                        set: { config.propertyId = $0.isEmpty ? nil : $0 }
+                    ), isEnabled: true, placeholder: "EX-AMPLE123")
+                    ConfigField(label: "Region (Optional)", value: Binding(
+                        get: { config.region ?? "" },
+                        set: { config.region = $0.isEmpty ? nil : $0 }
+                    ), isEnabled: true, placeholder: "Leave empty to use IP location")
+                    
+                    Toggle("Auto-Show Experience", isOn: $config.autoShowExperience)
+                        .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Consent Flag Type")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Picker("Consent Flag Type", selection: $config.consentFlagType) {
+                            ForEach(ConsentFlagType.allCases, id: \.self) { flagType in
+                                Text(flagType == .boolean ? "Boolean" : "Consent Mechanism").tag(flagType)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
+                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Non-Applicable Flag Mode")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Picker("Non-Applicable Flag Mode", selection: $config.consentNonApplicableFlagMode) {
+                            ForEach(ConsentNonApplicableFlagMode.allCases, id: \.self) { mode in
+                                Text(mode == .omit ? "Omit" : "Include").tag(mode)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
+                    .padding(.vertical, 4)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Presentation Style")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        Picker("Presentation Style", selection: $presentationStyle) {
+                            ForEach(PresentationStyle.allCases, id: \.self) { style in
+                                Text(style.rawValue).tag(style)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                    }
+                    .padding(.vertical, 4)
                 }
-            }) {
-                Text("Launch Full Example")
+                .padding(.vertical, 20)
+
+                Button(action: {
+                    config.save()
+                    janusManager.setConfig(config)
+                    
+                    switch presentationStyle {
+                    case .fullScreen:
+                        showFullExample = true
+                    case .sheet:
+                        showFullExampleSheet = true
+                    }
+                }) {
+                    Text("Launch Full Example")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(isLaunchEnabled ? Color.blue : Color.gray)
+                        .cornerRadius(10)
+                }
+                .disabled(!isLaunchEnabled)
+                .padding(.horizontal, 40)
+
+                Button(action: {
+                    janusManager.clearLocalStorage()
+                }) {
+                    HStack {
+                        Image(systemName: "trash")
+                        Text("Clear Example Storage")
+                    }
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(isLaunchEnabled ? Color.blue : Color.gray)
+                    .background(Color.red)
                     .cornerRadius(10)
-            }
-            .disabled(!isLaunchEnabled)
-            .padding(.horizontal, 40)
-
-            Button(action: {
-                janusManager.clearLocalStorage()
-            }) {
-                HStack {
-                    Image(systemName: "trash")
-                    Text("Clear Example Storage")
                 }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.red)
-                .cornerRadius(10)
+                .padding(.horizontal, 40)
+                
+                // Add some bottom padding to ensure content isn't cut off
+                Color.clear
+                    .frame(height: 20)
             }
-            .padding(.horizontal, 40)
-            .fullScreenCover(isPresented: $showFullExample) {
-                FullExampleView()
-                    .environmentObject(janusManager)
-            }
-            .sheet(isPresented: $showFullExampleSheet) {
-                FullExampleView()
-                    .environmentObject(janusManager)
-            }
-
-            Spacer()
+            .padding()
         }
-        .padding()
+        .fullScreenCover(isPresented: $showFullExample) {
+            FullExampleView()
+                .environmentObject(janusManager)
+        }
+        .sheet(isPresented: $showFullExampleSheet) {
+            FullExampleView()
+                .environmentObject(janusManager)
+        }
     }
 }
 
@@ -600,8 +652,7 @@ struct FullExampleView: View {
                             HStack {
                                 Text(key)
                                 Spacer()
-                                Text(value ? "Allowed ✓" : "Denied ✗")
-                                    .foregroundColor(value ? .green : .red)
+                                ConsentValueView(value: value)
                             }
                         }
 
@@ -792,6 +843,7 @@ struct EventLogView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(janusManager.events[index])
                             .font(.system(.body, design: .monospaced))
+                            .fixedSize(horizontal: false, vertical: true) // Allow text to wrap vertically
                     }
                     .padding(.vertical, 4)
                 }
@@ -944,6 +996,40 @@ struct WebViewEventLogView: View {
     }
 }
 
+// Helper view to display consent values based on their type
+struct ConsentValueView: View {
+    let value: Any
+    
+    var body: some View {
+        if let boolValue = value as? Bool {
+            // Boolean flag type display
+            Text(boolValue ? "Allowed ✓" : "Denied ✗")
+                .foregroundColor(boolValue ? .green : .red)
+        } else if let stringValue = value as? String {
+            // Consent mechanism flag type display - show the actual string value
+            Text(stringValue)
+                .foregroundColor(colorForConsentMechanism(stringValue))
+        } else {
+            // Fallback for unexpected types
+            Text("Unknown: \(String(describing: value))")
+                .foregroundColor(.gray)
+        }
+    }
+    
+    private func colorForConsentMechanism(_ mechanism: String) -> Color {
+        switch mechanism {
+        case "opt_in", "acknowledge":
+            return .green
+        case "opt_out":
+            return .red
+        case "not_applicable":
+            return .gray
+        default:
+            return .blue
+        }
+    }
+}
+
 // Add a CopyButton struct at the end of the file
 struct CopyButton: View {
     var action: () -> Void
@@ -978,4 +1064,3 @@ struct CopyButton: View {
     ContentView()
         .environmentObject(JanusManager())
 }
-
