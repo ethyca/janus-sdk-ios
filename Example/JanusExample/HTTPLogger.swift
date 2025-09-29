@@ -6,8 +6,9 @@ public class HTTPLogger: JanusLogger {
     private let authToken: String
     private let source: String
     private let session: URLSession
+    private let enableConsoleErrors: Bool
     
-    public init(endpoint: String, authToken: String, source: String = "iOSExampleApp") {
+    public init(endpoint: String, authToken: String, source: String = "iOSExampleApp", enableConsoleErrors: Bool = false) {
         guard let url = URL(string: endpoint) else {
             fatalError("Invalid endpoint URL: \(endpoint)")
         }
@@ -15,6 +16,7 @@ public class HTTPLogger: JanusLogger {
         self.authToken = authToken
         self.source = source
         self.session = URLSession.shared
+        self.enableConsoleErrors = enableConsoleErrors
     }
     
     public func log(_ message: String, level: LogLevel = .info, metadata: [String: String]? = nil, error: Error? = nil) {
@@ -72,8 +74,10 @@ public class HTTPLogger: JanusLogger {
                 return jsonString
             }
         } catch {
-            // JSON serialization failed - log the error but don't crash
-            print("HTTPLogger: JSON serialization failed for metadata: \(error.localizedDescription)")
+            // JSON serialization failed - log only if enabled
+            if enableConsoleErrors {
+                print("HTTPLogger: JSON serialization failed for metadata: \(error.localizedDescription)")
+            }
         }
         
         // Ultimate fallback to string representation
@@ -92,25 +96,33 @@ public class HTTPLogger: JanusLogger {
             
             session.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    print("HTTPLogger: Network error - \(error.localizedDescription)")
+                    if self.enableConsoleErrors {
+                        print("HTTPLogger: Network error - \(error.localizedDescription)")
+                    }
                     return
                 }
                 
                 guard let httpResponse = response as? HTTPURLResponse else {
-                    print("HTTPLogger: Invalid response")
+                    if self.enableConsoleErrors {
+                        print("HTTPLogger: Invalid response")
+                    }
                     return
                 }
                 
                 if !(200...299).contains(httpResponse.statusCode) {
-                    print("HTTPLogger: HTTP error - Status code: \(httpResponse.statusCode)")
-                    if let data = data, let responseBody = String(data: data, encoding: .utf8) {
-                        print("HTTPLogger: Response body - \(responseBody)")
+                    if self.enableConsoleErrors {
+                        print("HTTPLogger: HTTP error - Status code: \(httpResponse.statusCode)")
+                        if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+                            print("HTTPLogger: Response body - \(responseBody)")
+                        }
                     }
                 }
             }.resume()
         } catch {
-            print("HTTPLogger: Failed to serialize log data - \(error.localizedDescription)")
-            print("HTTPLogger: Log data that failed: \(logData)")
+            if enableConsoleErrors {
+                print("HTTPLogger: Failed to serialize log data - \(error.localizedDescription)")
+                print("HTTPLogger: Log data that failed: \(logData)")
+            }
         }
     }
 } 
