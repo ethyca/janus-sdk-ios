@@ -365,6 +365,13 @@ struct FullExampleView: View {
                         }
 
                         HStack {
+                            Text("Is TCF Experience:")
+                            Spacer()
+                            Text(Janus.isTCFExperience ? "Yes ✅" : "No ❌")
+                                .foregroundColor(Janus.isTCFExperience ? .green : .red)
+                        }
+
+                        HStack {
                             Text("Region:")
                             Spacer()
                             Text(janusManager.currentRegion.isEmpty ? "Not set" : janusManager.currentRegion)

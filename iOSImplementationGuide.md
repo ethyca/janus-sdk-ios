@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.20")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.21")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.20'
+  pod 'JanusSDK', '1.0.21'
 end
 ```
 
@@ -295,6 +295,23 @@ The `region` property returns the region code that the SDK is currently using, w
 - The region specified in the configuration during initialization
 - The region detected via IP geolocation
 - Empty string if no region has been determined yet
+
+### TCF Experience Detection
+
+The Janus SDK provides a property to check if the current privacy experience is a TCF (Transparency and Consent Framework) experience:
+
+```swift
+// Check if the current experience is a TCF experience
+let isTCF = Janus.isTCFExperience
+
+if isTCF {
+    // Handle TCF-specific logic
+    print("This is a TCF experience")
+} else {
+    // Handle non-TCF experience
+    print("This is a standard privacy experience")
+}
+```
 
 ### WKWebView Integration
 

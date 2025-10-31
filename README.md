@@ -71,6 +71,7 @@ The main entry point for integrating consent management capabilities is the Janu
 **Key Methods/Properties:**
 - `initialize(config, callback)`: Configures the SDK and provides platform-specific callbacks for when Janus is initialized or a `JanusError`. After inititialization, any privacy experience that matches the region and property ID will automatically be shown.
 - `currentExperience`: Gets the current privacy experience.
+- `isTCFExperience`: A boolean indicating whether the current privacy experience is a TCF (Transparency and Consent Framework) experience.
 - `hasExperience`: True when there is an experience available for the current region and propertyId.
 - `shouldShowExperience`: A boolean indicating whether the privacy experience should be shown to the user. Returns true if a valid experience exists and the users consent is not present or not valid.
 - `showExperience()`: Display the consent management interface to the user if `hasExperience` is true.
