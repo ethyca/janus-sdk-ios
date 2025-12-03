@@ -86,7 +86,7 @@ The main entry point for integrating consent management capabilities is the Janu
   - `createdAt`: A timestamp indicating when the consent was created.
   - `updatedAt`: A timestamp indicating when the consent was last updated.
   - `consentMethod`: A string indicating how the consent was provided (e.g., "save", "dismiss").
-- `fides_string`: The user's current consent string(s) combined into a single value.
+- `fides_string`: The user's current consent string(s) in the format `TC_STRING,AC_STRING,GPP_STRING,NC_STRING` where TC_STRING is the IAB TCF string, AC_STRING is Google's Additional Consent string, GPP_STRING is the IAB GPP string, and NC_STRING is a Base64 encoded string of Notice Consent preferences.
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
 - `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). If used, setLogger should be called prior to initialize, in order to obtain logs during init.
 

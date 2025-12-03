@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.21")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.22")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.21'
+  pod 'JanusSDK', '1.0.22'
 end
 ```
 
@@ -200,7 +200,9 @@ let analyticsConsent = Janus.consent["analytics"] ?? false
 // Get all the user's consent choices
 let consent = Janus.consent
 
-// List of IAB strings like CPzHq4APzHq4AAMABBENAUEAALAAAEOAAAAAAEAEACACAAAA,1~61.70
+// Fides string in format TC_STRING,AC_STRING,GPP_STRING,NC_STRING
+// TC_STRING: IAB TCF string, AC_STRING: Google Additional Consent, 
+// GPP_STRING: IAB GPP string, NC_STRING: Base64 Notice Consent preferences
 let fides_string = Janus.fides_string
 ```
 
