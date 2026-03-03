@@ -17,6 +17,7 @@ enum ConfigurationType: String, CaseIterable {
     case ethyca = "Ethyca"
     case ethycaEmpty = "Ethyca (Empty)"
     case localSlim = "Local Slim"
+    case localProxy = "Local Proxy"  // Uses tunnel to expose local dev via public URLs
     case localDemo = "Local Demo"
     case cookieHouse = "Cookie House (RC)"
     case cookieHouseNightly = "Cookie House (Nightly)"
@@ -58,6 +59,18 @@ struct JanusConfig {
                 website: "http://localhost:3001",
                 propertyId: nil,
                 region: nil,
+                autoShowExperience: true,
+                consentFlagType: .boolean,
+                consentNonApplicableFlagMode: .omit
+            )
+        case .localProxy:
+            return JanusConfig(
+                type: .localProxy,
+                apiHost: "https://ethyca.braverobot.net",
+                privacyCenterHost: "https://privacy.braverobot.net",
+                website: "https://privacy.braverobot.net",
+                propertyId: "FDS-C33DQM",
+                region: "DE",
                 autoShowExperience: true,
                 consentFlagType: .boolean,
                 consentNonApplicableFlagMode: .omit

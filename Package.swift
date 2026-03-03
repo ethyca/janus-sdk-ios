@@ -14,7 +14,7 @@ let package = Package(
   targets: [
     .binaryTarget(
       name: "JanusSDK",
-      url: "https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.0.22/JanusSDK.xcframework.zip",
-      checksum: "1dbb9f2e79bff44047a49560b37175d4f7d33169b109618e3a51d009b1741bf9")
+      url: "https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.0.23/JanusSDK.xcframework.zip",
+      checksum: "b64dbe94d2b3214eba9243445152ac939a01724ef45fc55c7a4c8058f810fbe0")
   ]
 ) 
