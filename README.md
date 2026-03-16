@@ -62,6 +62,17 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
    - A good pattern is to call `releaseConsentWebView()` in your view controller's `deinit` method or whenever the WebView is no longer needed
    - For single-page applications, retain the WebView for the app's lifetime; for multi-page applications, release and recreate as needed
 
+## Methods Available Before Initialization
+
+Most SDK methods require initialization to complete successfully before they can be called. However, the following methods can be called **before** the `initialize()` callback completes:
+
+| Method | Description |
+|--------|-------------|
+| `setLogger(logger)` | Sets a custom logger implementation. Should be called before `initialize()` to capture logs during initialization. |
+| `getLocationByIPAddress(callback)` | Performs IP-based location detection. Can be used to determine the user's region before calling `initialize()`, allowing you to provide a `region` parameter if needed. |
+
+All other methods require initialization to complete first. Calling them before the `initialize()` callback executes with a "success" condition will throw a `JanusError.notInitialized` exception.
+
 ## Core Components
 
 ### JanusSDK
@@ -75,7 +86,7 @@ The main entry point for integrating consent management capabilities is the Janu
 - `hasExperience`: True when there is an experience available for the current region and propertyId.
 - `shouldShowExperience`: A boolean indicating whether the privacy experience should be shown to the user. Returns true if a valid experience exists and the users consent is not present or not valid.
 - `showExperience()`: Display the consent management interface to the user if `hasExperience` is true.
-- `getLocationByIPAddress(callback)`: Performs IP-based location detection and provides the resulting location data through the callback.
+- `getLocationByIPAddress(callback)`: Performs IP-based location detection and provides the resulting location data through the callback. **This method can be called before initialization** to determine the user's region prior to calling `initialize()`.
 - `region`: Returns the region code currently being used by the SDK after initialization.
 - `listenerId = addConsentEventListener(listener)`: Attaches to events emitted during key user interactions.
 - `removeConsentEventListener(listenerId)`: Removes an event listener.
@@ -88,7 +99,7 @@ The main entry point for integrating consent management capabilities is the Janu
   - `consentMethod`: A string indicating how the consent was provided (e.g., "save", "dismiss").
 - `fides_string`: The user's current consent string(s) in the format `TC_STRING,AC_STRING,GPP_STRING,NC_STRING` where TC_STRING is the IAB TCF string, AC_STRING is Google's Additional Consent string, GPP_STRING is the IAB GPP string, and NC_STRING is a Base64 encoded string of Notice Consent preferences.
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
-- `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). If used, setLogger should be called prior to initialize, in order to obtain logs during init.
+- `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). **This method should be called before initialization** to capture logs during the init process.
 
 **Janus Logger Interface:**
 A protocol/interface for implementing custom logging functionality. Custom loggers must implement:
@@ -203,7 +214,7 @@ This ensures that consent state and UI interactions remain synchronized between 
 
 The SDK provides detailed error types via `JanusError`:
 - `invalidConfiguration`: Invalid SDK configuration provided during initialization on the callback
-- `notInitialized`: Thrown as an exception if a method is called before the initialize callback completes
+- `notInitialized`: Thrown as an exception if a method is called before the initialize callback completes (except for `setLogger()` and `getLocationByIPAddress()`, which can be called before initialization—see "Methods Available Before Initialization" above)
 - `networkError`: Provided during initialization on the callback, or thrown as an exception during API operations
 - `authenticationFailed`: Provided during initialization on the callback if API credentials are invalid
 - `apiError`: Provided during initialization on the callback, or thrown as an exception when the API returns an error

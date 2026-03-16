@@ -12,6 +12,11 @@ import WebKit
 // Local file imports
 import Foundation // This is imported so we don't need to add it explicitly elsewhere
 
+// MARK: - Notification Names
+extension Notification.Name {
+    static let refreshIABTCF = Notification.Name("RefreshIABTCF")
+}
+
 // Add this enum and struct before ContentView
 enum ConfigurationType: String, CaseIterable {
     case ethyca = "Ethyca"
@@ -729,6 +734,25 @@ struct FullExampleView: View {
                         }
                     })
 
+                    // IAB TCF Values Section
+                    Section(content: {
+                        IABTCFInspectorView()
+                    }, header: {
+                        HStack {
+                            Text("IAB TCF Values")
+                            Spacer()
+                            Button("Refresh") {
+                                // Force view refresh by triggering state change
+                                NotificationCenter.default.post(name: .refreshIABTCF, object: nil)
+                            }
+                            .font(.footnote)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(6)
+                        }
+                    })
+
                     if !janusManager.backgroundWebViews.isEmpty {
                         Section(content: {
                             ForEach(janusManager.backgroundWebViews, id: \.id) { webViewEntry in
@@ -1077,6 +1101,79 @@ struct CopyButton: View {
                 .scaleEffect(isPressed ? 1.25 : 1.0)
         }
         .buttonStyle(BorderlessButtonStyle())
+    }
+}
+
+// MARK: - IAB TCF Inspector View
+struct IABTCFInspectorView: View {
+    @State private var values: [String: Any] = [:]
+
+    // Use the shared key list from IABTCFStorage (per IAB TCF v2.2 Mobile Specification)
+    private let iabTCFKeys = IABTCFStorage.ALL_IABTCF_KEYS
+
+    var body: some View {
+        Group {
+            if values.isEmpty {
+                Text("No IAB TCF values found")
+                    .italic()
+                    .foregroundColor(.gray)
+            } else {
+                ForEach(iabTCFKeys, id: \.self) { key in
+                    if let value = values[key] {
+                        HStack(alignment: .top) {
+                            Text(key.replacingOccurrences(of: "IABTCF_", with: ""))
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .frame(width: 120, alignment: .leading)
+                            Spacer()
+                            Text(formatValue(value))
+                                .font(.caption.monospaced())
+                                .foregroundColor(.primary)
+                                .lineLimit(3)
+                                .truncationMode(.tail)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear {
+            loadValues()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .refreshIABTCF)) { _ in
+            loadValues()
+        }
+    }
+
+    private func loadValues() {
+        values = getIABTCFValues()
+    }
+
+    private func getIABTCFValues() -> [String: Any] {
+        var values: [String: Any] = [:]
+        let defaults = UserDefaults.standard
+
+        for key in iabTCFKeys {
+            if let value = defaults.object(forKey: key) {
+                values[key] = value
+            }
+        }
+
+        return values
+    }
+
+    private func formatValue(_ value: Any) -> String {
+        if let intValue = value as? Int {
+            return String(intValue)
+        } else if let stringValue = value as? String {
+            // Truncate long strings
+            if stringValue.count > 50 {
+                return String(stringValue.prefix(47)) + "..."
+            }
+            return stringValue
+        } else {
+            return String(describing: value)
+        }
     }
 }
 
