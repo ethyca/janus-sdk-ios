@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.24")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.25")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.24'
+  pod 'JanusSDK', '1.0.25'
 end
 ```
 
@@ -147,7 +147,8 @@ let config = JanusConfiguration(
     saveUserPreferencesToFides: true,                         // 💾 Save user preferences to Fides via privacy-preferences API (default true)
     saveNoticesServedToFides: true,                           // 💾 Save notices served to Fides via notices-served API (default true)
     consentFlagType: .boolean,                                // 🎯 Format for consent values (default boolean)
-    consentNonApplicableFlagMode: .omit                       // 🔄 Handle non-applicable notices (default omit)
+    consentNonApplicableFlagMode: .omit,                      // 🔄 Handle non-applicable notices (default omit)
+    enableATT: true                                           // 📲 Request Apple ATT permission before showing the privacy experience (default false, iOS 14+)
 )
 ```
 
@@ -331,3 +332,36 @@ Janus.releaseConsentWebView(webView)
 ```
 
 ⚠️ **Important:** Always call `releaseConsentWebView()` when you're done with a WebView to prevent memory leaks. WebKit's script message handlers require explicit cleanup, and failing to release the WebView properly can lead to resource issues.
+
+### Apple App Tracking Transparency (ATT)
+
+On iOS 14+, Apple requires apps to request permission before tracking users across apps and websites. Janus can handle the ATT dialog natively, automatically enforcing consent based on the user's response.
+
+#### Enabling ATT
+
+Set `enableATT: true` in `JanusConfiguration`. When enabled, Janus will present the system ATT permission dialog before showing the privacy experience. If the user denies or restricts tracking, all non-exempt privacy notices are pre-populated to opt-out and their toggles are locked.
+
+```swift
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    propertyId: "FDS-A0B1C2",
+    enableATT: true
+)
+```
+
+#### Required Info.plist Key
+
+The system ATT dialog requires `NSUserTrackingUsageDescription` in your **app's** `Info.plist`. Janus cannot add this for you — the host app must include it:
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>We use this to deliver personalized content and measure ad performance.</string>
+```
+
+Without this key, calling `ATTrackingManager.requestTrackingAuthorization` will cause a crash at runtime.
+
+#### ATT-Exempt Notices
+
+By default, nearly all notices apply to ATT, meaning they are automatically opted-out when ATT is denied. The exception would be notices meant for informative purposes only, e.g. an "Essential" notice, which cannot be opted out of.
+
+Aside from essential notices, a standard notice can be configured with `att_exempt` so that the notice is unaffected when ATT is denied, and the toggles remain interactive. This is configured within the Admin-UI.

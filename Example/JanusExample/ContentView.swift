@@ -39,6 +39,7 @@ struct JanusConfig {
     var autoShowExperience: Bool = true
     var consentFlagType: ConsentFlagType = .boolean
     var consentNonApplicableFlagMode: ConsentNonApplicableFlagMode = .omit
+    var enableATT: Bool = false
 
     static func forType(_ type: ConfigurationType) -> JanusConfig {
         switch type {
@@ -78,7 +79,8 @@ struct JanusConfig {
                 region: "DE",
                 autoShowExperience: true,
                 consentFlagType: .boolean,
-                consentNonApplicableFlagMode: .omit
+                consentNonApplicableFlagMode: .omit,
+                enableATT: true
             )
         case .localDemo:
             return JanusConfig(

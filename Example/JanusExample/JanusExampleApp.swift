@@ -107,7 +107,8 @@ class JanusManager: ObservableObject {
             fidesEvents: true,
             autoShowExperience: config.autoShowExperience,
             consentFlagType: config.consentFlagType,
-            consentNonApplicableFlagMode: config.consentNonApplicableFlagMode
+            consentNonApplicableFlagMode: config.consentNonApplicableFlagMode,
+            enableATT: config.enableATT
         )
         
         Janus.initialize(config: janusConfig, completion: { [weak self] success, error in
