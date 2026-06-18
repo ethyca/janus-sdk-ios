@@ -344,6 +344,7 @@ struct FullExampleView: View {
     @State private var backgroundWebViewAutoSync = true
     @State private var selectedRegion = "US-CA"
     @State private var regionInput = ""
+    @State private var analyticsConsent = false
     @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
@@ -631,6 +632,47 @@ struct FullExampleView: View {
                         }
                     }, header: {
                         Text("Actions")
+                    })
+
+                    Section(content: {
+                        Toggle("analytics", isOn: $analyticsConsent)
+                            .toggleStyle(SwitchToggleStyle(tint: .blue))
+
+                        HStack(spacing: 8) {
+                            Button("setConsent()") {
+                                janusManager.trackSetConsentCall()
+                                Janus.setConsent(values: ["analytics": analyticsConsent])
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+
+                            Button("+ saveToFides") {
+                                janusManager.trackSetConsentCall()
+                                Janus.setConsent(values: ["analytics": analyticsConsent], saveToFides: true)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(Color.orange)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                        }
+
+                        HStack {
+                            Text("WebView echo events:")
+                            Spacer()
+                            Text("\(janusManager.setConsentEchoCount)")
+                                .foregroundColor(janusManager.setConsentEchoCount > 1 ? .red : .primary)
+                                .fontWeight(janusManager.setConsentEchoCount > 1 ? .bold : .regular)
+                        }
+                        .font(.caption)
+                    }, header: {
+                        Text("setConsent Test")
+                    }, footer: {
+                        Text("Add background WebViews above, then tap setConsent(). Echo count > 1 indicates a loop.")
+                            .font(.caption2)
                     })
 
                     Section(content: {

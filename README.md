@@ -99,6 +99,7 @@ The main entry point for integrating consent management capabilities is the Janu
   - `consentMethod`: A string indicating how the consent was provided (e.g., "save", "dismiss").
 - `fides_string`: The user's current consent string(s) in the format `TC_STRING,AC_STRING,GPP_STRING,NC_STRING` where TC_STRING is the IAB TCF string, AC_STRING is Google's Additional Consent string, GPP_STRING is the IAB GPP string, and NC_STRING is a Base64 encoded string of Notice Consent preferences.
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
+- `setConsent(values, fidesString, consentMethod, saveToFides)`: Programmatically writes consent values to native storage without showing the privacy experience UI. Fires an `experienceSelectionUpdated` event to all registered listeners. Use this for bidirectional WebView sync (pushing FidesJS consent back to native) or legacy consent migration. The optional `saveToFides` parameter (default: false) attempts a server sync if an experience is currently loaded.
 - `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). **This method should be called before initialization** to capture logs during the init process.
 
 **Janus Logger Interface:**
@@ -159,7 +160,7 @@ The following events are dispatched by JanusSDK as part of its native lifecycle,
 | Native UI interaction       | `experienceInteraction`       | User interacts with elements in the native consent UI          |
 | Native experience closed    | `experienceClosed`            | The native consent experience is dismissed                     |
 | Native consent updating     | `experienceSelectionUpdating` | User's consent selection is being processed                    |
-| Native consent updated      | `experienceSelectionUpdated`  | User's consent has been saved and applied                      |
+| Native consent updated      | `experienceSelectionUpdated`  | User's consent has been saved and applied (also fired by `setConsent()`) |
 | WebView consent updated     | `consentUpdatedFromWebView`   | Consent selection has been updated in a WebView and saved      |
 
 #### Event Details

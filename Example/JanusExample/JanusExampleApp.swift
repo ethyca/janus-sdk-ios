@@ -70,6 +70,16 @@ class JanusManager: ObservableObject {
     
     // Track currently selected WebView for event display
     @Published var selectedWebViewId: Int? = nil
+
+    // setConsent echo counter — tracks ConsentUpdatedFromWebViewEvent fires after the most recent
+    // programmatic setConsent() call, to detect whether a multi-WebView echo loop is occurring.
+    @Published var setConsentEchoCount: Int = 0
+    private var setConsentCallTimestamp: Date? = nil
+
+    func trackSetConsentCall() {
+        setConsentCallTimestamp = Date()
+        setConsentEchoCount = 0
+    }
     
     func setConfig(_ config: JanusConfig) {
         self.config = config
@@ -311,6 +321,13 @@ class JanusManager: ObservableObject {
                 // Refresh consent values for ConsentUpdatedFromWebViewEvent and ExperienceSelectionUpdatedEvent
                 if event is ConsentUpdatedFromWebViewEvent || event is ExperienceSelectionUpdatedEvent {
                     self?.refreshConsentValues()
+                }
+                // Count WebView echo events that arrive after a programmatic setConsent() call.
+                // A counter > 1 indicates a multi-WebView bounce loop.
+                if event is ConsentUpdatedFromWebViewEvent,
+                   let callTime = self?.setConsentCallTimestamp,
+                   Date().timeIntervalSince(callTime) < 10 {
+                    self?.setConsentEchoCount += 1
                 }
             }
         }
