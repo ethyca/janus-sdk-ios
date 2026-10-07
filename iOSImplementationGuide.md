@@ -9,7 +9,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.0.27")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.1.0")
 ]
 ```
 
@@ -19,7 +19,7 @@ dependencies: [
 source 'https://github.com/ethyca/janus-sdk-ios.git'
 
 target 'YourApp' do
-  pod 'JanusSDK', '1.0.27'
+  pod 'JanusSDK', '1.1.0'
 end
 ```
 
@@ -79,6 +79,8 @@ The SDK provides specific error types through the `JanusError` enum that help yo
 - If `noRegionProvided` occurs, show a region selector to the user and reinitialize
 - For `networkError`, provide a retry option
 - With `invalidConfiguration`, check your configuration values for correctness
+
+`error.localizedDescription` describes the case (for example `Authentication failed with the API`, which means the privacy-experience endpoint returned 401/403 — usually `apiHost` pointing at an authenticated API host rather than the Privacy Center), and `(error as? JanusError)?.caseName` gives the case as a stable string for logging.
 
 Here's a complete example of initialization with proper error handling:
 
@@ -241,6 +243,20 @@ A `JanusEvent` (`.EXPERIENCE_SELECTION_UPDATED`) is fired to all registered list
 ```swift
 Janus.clearConsent()                     // clear values, keep timestamps
 Janus.clearConsent(clearMetadata: true)  // clear everything
+```
+
+### External User ID
+
+Use `setExternalId()` to attach your application's own user identifier (e.g. an Auth0 `sub` or database UUID) to every consent and notices-served request the SDK sends to Fides. Fides stores this on the `BrowserIdentity` of each request, letting it link consent records to a known user — which enables DSR (data subject request) correlation and consent merging across a user's devices.
+
+Call it after the user logs in. Pass `nil` to clear the identifier on logout. The value is held in memory for the lifetime of the SDK and applied to all *subsequent* API calls; it does not retroactively update records already sent.
+
+```swift
+// After login — associate consent with your app's user ID
+Janus.setExternalId("auth0|abc123")
+
+// On logout — stop associating consent with the user
+Janus.setExternalId(nil)
 ```
 
 ### Controlling Privacy Experience Display

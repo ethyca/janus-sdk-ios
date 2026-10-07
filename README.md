@@ -9,10 +9,14 @@ The Janus SDK provides a comprehensive solution for implementing privacy-first c
 
 ## Available SDKs & Requirements
 
-- **iOS SDK** (13.0+)
+- **iOS SDK** (15.0+)
 - **Android SDK** (API 21+)
-- **Flutter SDK** (Flutter 3.3.0+, Dart 3.7.2+, iOS 13.0+, Android API 21+)
+- **Flutter SDK** (Flutter 3.3.0+, Dart 3.7.2+, iOS 15.0+, Android API 21+)
 - **Fides Privacy Center** (2.59.1+)
+
+> **Breaking change:** the minimum iOS version for the iOS and Flutter SDKs is now **15.0**. Xcode 27 no longer builds for iOS 13 or 14; apps targeting those versions should stay on iOS SDK 1.0.27 / Flutter SDK 0.1.25.
+>
+> The same iOS release removes the `JanusConfiguration` initializer that had no `theme:` parameter; the remaining initializer defaults `theme` to `.default`, so existing calls compile unchanged, but it is a public symbol removal for anyone linking the framework without recompiling.
 
 ## Key Features
 
@@ -100,6 +104,7 @@ The main entry point for integrating consent management capabilities is the Janu
 - `fides_string`: The user's current consent string(s) in the format `TC_STRING,AC_STRING,GPP_STRING,NC_STRING` where TC_STRING is the IAB TCF string, AC_STRING is Google's Additional Consent string, GPP_STRING is the IAB GPP string, and NC_STRING is a Base64 encoded string of Notice Consent preferences.
 - `clearConsent(clearMetadata)`: Clears all consent data. The optional `clearMetadata` parameter (default: false) determines whether to also clear consent metadata.
 - `setConsent(values, fidesString, consentMethod, saveToFides)`: Programmatically writes consent values to native storage without showing the privacy experience UI. Fires an `experienceSelectionUpdated` event to all registered listeners. Use this for bidirectional WebView sync (pushing FidesJS consent back to native) or legacy consent migration. The optional `saveToFides` parameter (default: false) attempts a server sync if an experience is currently loaded.
+- `setExternalId(id)`: Sets an app-defined external user identifier (e.g. an Auth0 `sub` or database UUID) that is included in the `BrowserIdentity` of all subsequent consent and notices-served API calls. This lets Fides link consent records to a known user, enabling DSR (data subject request) correlation and consent merging across a user's devices. Call after login; pass `null`/`nil` to clear it on logout. Applies only to subsequent calls — it does not retroactively update records already sent.
 - `setLogger(logger)`: Sets a custom logger implementation for debugging and monitoring SDK operations. Accepts any object that implements the JanusLogger interface (see below). **This method should be called before initialization** to capture logs during the init process.
 
 **Janus Logger Interface:**
