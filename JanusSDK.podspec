@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'JanusSDK'
-  s.version      = '1.1.0'
+  s.version      = '1.2.0'
   s.summary      = 'Janus SDK for iOS applications'
   s.description  = 'Janus SDK provides privacy consent management for iOS applications.'
   s.homepage     = 'https://github.com/ethyca/janus-sdk-ios'

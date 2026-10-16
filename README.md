@@ -127,6 +127,8 @@ A protocol/interface for implementing custom logging functionality. Custom logge
 - `saveNoticesServedToFides`: 💾 Save notices served to Fides via notices-served API - defaults to true
 - `consentFlagType`: 🎯 The format for consent values returned by external interfaces - defaults to boolean (options: "boolean", "consentMechanism")
 - `consentNonApplicableFlagMode`: 🔄 Controls how non-applicable privacy notices are handled in consent objects - defaults to omit (options: "omit", "include")
+- `enableATT` (`enableAtt` in Flutter): 📲 Request Apple ATT permission before showing the privacy experience - defaults to false (iOS only)
+- `enableBannerMode`: 🪧 Show `banner_and_modal` experiences as a compact banner before the full modal - defaults to false
 
 > **Note:** For full TCF support, the JanusSDK requires a minimum version of 2.59.1 for the Fides privacy-center image
 
@@ -171,7 +173,7 @@ The following events are dispatched by JanusSDK as part of its native lifecycle,
 #### Event Details
 
 - `experienceInteraction`: Contains a `<string,bool>` key-value pair indicating the element clicked and its toggle state.
-- `experienceClosed`: Contains a string identifying how the experience was dismissed.
+- `experienceClosed`: Contains a string identifying how the experience was dismissed. On iOS, a TCF overlay that was shown because consent was needed closes when a host `setConsent()` update supplies that consent, and reports `consent_updated`; an overlay the user opened to change their choices stays open. A user-initiated TCF close reports `tcf_closed`.
 - `experienceSelectionUpdating`: Contains the user's intended consent collection.
 - `consentUpdatedFromWebView`: Contains the updated consent values from the WebView.
 

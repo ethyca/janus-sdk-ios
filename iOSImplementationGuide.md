@@ -1,6 +1,11 @@
 # Janus SDK 
 ## iOS Implementation Guide
 
+### Requirements
+
+- iOS 15 or later
+- Xcode 26.0 or later. We build each release with Xcode 26.0.1, the oldest Xcode 26 available to our build machines, and it uses the same Swift 6.2 compiler as Xcode 26.0, so any Xcode from 26.0 on can read it.
+
 ### Installation
 
 #### Swift Package Manager
@@ -9,19 +14,21 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.1.0")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.2.0")
 ]
 ```
 
 #### CocoaPods
 
-```ruby
-source 'https://github.com/ethyca/janus-sdk-ios.git'
+JanusSDK isn't published to the CocoaPods trunk, so point CocoaPods at its podspec directly. No `source` line is needed:
 
+```ruby
 target 'YourApp' do
-  pod 'JanusSDK', '1.1.0'
+  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.2.0/JanusSDK.podspec'
 end
 ```
+
+To upgrade, change the version in the URL.
 
 ### Custom Logging
 
@@ -150,7 +157,8 @@ let config = JanusConfiguration(
     saveNoticesServedToFides: true,                           // 💾 Save notices served to Fides via notices-served API (default true)
     consentFlagType: .boolean,                                // 🎯 Format for consent values (default boolean)
     consentNonApplicableFlagMode: .omit,                      // 🔄 Handle non-applicable notices (default omit)
-    enableATT: true                                           // 📲 Request Apple ATT permission before showing the privacy experience (default false, iOS 14+)
+    enableATT: true,                                          // 📲 Request Apple ATT permission before showing the privacy experience (default false, iOS 14+)
+    enableBannerMode: true                                    // 🪧 Show banner_and_modal experiences as a compact banner first (default false)
 )
 ```
 
@@ -214,7 +222,7 @@ let fides_string = Janus.fides_string
 Use `setConsent()` to write consent values directly to the SDK from native code — without showing the privacy experience UI. This is intended for two scenarios:
 
 1. **Bidirectional WebView sync** — your app hosts a FidesJS page in a custom `WKWebView` and needs to push web-originated consent into native storage via a JS bridge.
-2. **Legacy consent migration** — users already consented through an older flow; pre-populate the SDK before the experience initializes so they aren't re-prompted.
+2. **Legacy consent migration** — users already consented through an older flow; carry their choice into the SDK so they aren't re-prompted. Call `setConsent()` after `initialize` completes and before the experience shows, with `autoShowExperience` turned off. `setConsent()` only saves to Fides when an experience is loaded, so a call made before then stores consent on the device and never sends it to Fides. Pass the external provider consent method so Fides records the consent as carried over.
 
 ```swift
 // Minimal call — local persist only, no server sync
@@ -234,9 +242,19 @@ Janus.setConsent(
     consentMethod: .save,
     saveToFides: true
 )
+
+// Migrating consent recorded before Janus. Call after initialize completes: the Fides save needs a loaded experience
+// The method lets Fides tell it apart from a choice made in the experience
+Janus.setConsent(
+    values: ["data_sales_and_sharing": false],
+    consentMethod: .externalProvider,
+    saveToFides: true
+)
 ```
 
 A `JanusEvent` (`.EXPERIENCE_SELECTION_UPDATED`) is fired to all registered listeners after consent is written, identical to the event fired when a user submits the privacy experience UI.
+
+**With `enableATT` on and tracking denied or restricted,** `setConsent()` stores `false` for every non-exempt notice, even if you pass `true`, and saves that to Fides when `saveToFides` is set. Janus logs a warning naming the notices it switched off. ATT-exempt and notice-only notices keep the values you pass.
 
 `clearConsent()` resets all stored consent values and optionally clears metadata timestamps:
 
@@ -399,6 +417,28 @@ Janus WebViews are **bidirectional**: consent changes flow both ways between nat
 
 These two layers work together so that a WebView-initiated consent change does not bounce indefinitely between FidesJS and native code.
 
+### Banner Mode
+
+By default, Janus shows every non-TCF experience as a full-screen modal. Set `enableBannerMode: true` to show `banner_and_modal` experiences as a compact banner first, matching the layered banner on the web. The banner offers Reject All, Accept All, and a Manage preferences button that opens the full modal.
+
+```swift
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    propertyId: "FDS-A0B1C2",
+    enableBannerMode: true
+)
+```
+
+When banner mode is on:
+
+1. **The banner appears only while consent is still needed**, i.e. when `shouldShowExperience` is true. Once the user has made a choice, `showExperience` opens the full modal directly, so a "Privacy settings" link in your app skips the banner. Dismissing the banner with the close button saves each notice's default as implied consent (consent method `dismiss`) when the user has no saved consent yet. Implied consent doesn't count as a choice, so the banner resurfaces on the next `showExperience`, as it does on the web.
+2. **Text and labels come from the experience config.** The banner uses `banner_title` and `banner_description`, falling back to `title` and `description`, and the button labels from the same translation.
+3. **`layer1_button_options` picks the buttons.** `acknowledge`, or an experience whose notices are all notice-only, shows a single Acknowledge button. `opt_in_opt_out` and `gpc_conditional` show Reject All and Accept All (apps have no GPC signal).
+4. **Notices served are recorded with `serving_component: banner`**, and the modal opened from the banner records `modal`.
+5. **The close button dismisses only when the experience is dismissable.** A non-dismissable banner stays until the user makes a choice.
+
+Other component types, including `modal` and TCF experiences, are unaffected by this flag.
+
 ### Apple App Tracking Transparency (ATT)
 
 On iOS 14+, Apple requires apps to request permission before tracking users across apps and websites. Janus can handle the ATT dialog natively, automatically enforcing consent based on the user's response.
@@ -414,6 +454,11 @@ let config = JanusConfiguration(
     enableATT: true
 )
 ```
+
+Janus also re-checks the current ATT status on its own, so a user who changes tracking in the iOS Settings app doesn't have to wait for the next prompt:
+
+1. **When Janus initializes and when the app returns to the foreground,** it reads the live status. If tracking is now denied or restricted, it switches non-exempt notices off in stored consent and in any open consent screen.
+2. **When tracking is later allowed,** the toggles unlock, but Janus doesn't switch anything back on. The user opts in again themselves.
 
 #### Required Info.plist Key
 
