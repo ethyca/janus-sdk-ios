@@ -2,8 +2,6 @@
 //  JanusExampleTests.swift
 //  JanusExampleTests
 //
-//  Created by Thabo Fletcher on 3/5/25.
-//
 
 import Testing
 @testable import JanusExample

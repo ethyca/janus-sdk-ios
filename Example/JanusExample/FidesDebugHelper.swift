@@ -2,8 +2,6 @@
 //  FidesDebugHelper.swift
 //  JanusExample
 //
-//  Created by Thabo Fletcher on 3/7/25.
-//
 
 import Foundation
 import WebKit

@@ -2,8 +2,6 @@
 //  JanusExampleUITests.swift
 //  JanusExampleUITests
 //
-//  Created by Thabo Fletcher on 3/5/25.
-//
 
 import XCTest
 
