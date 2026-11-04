@@ -14,7 +14,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.2.1")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.3.0")
 ]
 ```
 
@@ -24,7 +24,7 @@ JanusSDK isn't published to the CocoaPods trunk, so point CocoaPods at its podsp
 
 ```ruby
 target 'YourApp' do
-  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.2.1/JanusSDK.podspec'
+  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.3.0/JanusSDK.podspec'
 end
 ```
 
