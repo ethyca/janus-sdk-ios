@@ -14,7 +14,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.3.0")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.4.0")
 ]
 ```
 
@@ -24,7 +24,7 @@ JanusSDK isn't published to the CocoaPods trunk, so point CocoaPods at its podsp
 
 ```ruby
 target 'YourApp' do
-  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.3.0/JanusSDK.podspec'
+  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.4.0/JanusSDK.podspec'
 end
 ```
 
@@ -158,6 +158,8 @@ let config = JanusConfiguration(
     consentFlagType: .boolean,                                // 🎯 Format for consent values (default boolean)
     consentNonApplicableFlagMode: .omit,                      // 🔄 Handle non-applicable notices (default omit)
     enableATT: true,                                          // 📲 Request Apple ATT permission before showing the privacy experience (default false, iOS 14+)
+    enableAgeSignal: true,                                    // Request the user's age range from iOS during initialization (default false, iOS 26+)
+    ageBracket: nil,                                          // An age bracket your app already knows; it wins over the iOS age range (default nil)
     enableBannerMode: true                                    // 🪧 Show banner_and_modal experiences as a compact banner first (default false)
 )
 ```
@@ -255,6 +257,8 @@ Janus.setConsent(
 A `JanusEvent` (`.EXPERIENCE_SELECTION_UPDATED`) is fired to all registered listeners after consent is written, identical to the event fired when a user submits the privacy experience UI.
 
 **With `enableATT` on and tracking denied or restricted,** `setConsent()` stores `false` for every non-exempt notice, even if you pass `true`, and saves that to Fides when `saveToFides` is set. Janus logs a warning naming the notices it switched off. ATT-exempt and notice-only notices keep the values you pass.
+
+**With an `under13` age bracket,** `setConsent()` stores `false` for any GPC-flagged notice you try to switch on, unless you pass `consentMethod: .parentalConsent`. See [Minor Age Signal](#minor-age-signal).
 
 `clearConsent()` resets all stored consent values and optionally clears metadata timestamps:
 
@@ -412,7 +416,7 @@ Janus WebViews are **bidirectional**: consent changes flow both ways between nat
 
 **How loops are prevented:**
 
-1. **Source exclusion** — When a consent update originates *from* a WebView, Janus propagates the change to all *other* managed WebViews but skips the source WebView. Programmatic calls (e.g. `setConsent()`) have no source WebView and propagate to all.
+1. **Source exclusion** — When a consent update originates *from* a WebView, Janus propagates the change to all *other* managed WebViews but skips the source WebView. Programmatic calls (e.g. `setConsent()`) have no source WebView and propagate to all. The exception is a save the minor age signal turned back: Janus then sends its values to every managed WebView, the source included, and the bridge ignores the `FidesUpdated` events these Janus-sourced updates cause.
 2. **FidesJS idempotency** — FidesJS does not re-dispatch a `FidesUpdated` event when the incoming consent values are identical to the current state. This prevents an echo from triggering a second round-trip back to native.
 
 These two layers work together so that a WebView-initiated consent change does not bounce indefinitely between FidesJS and native code.
@@ -476,3 +480,112 @@ Without this key, calling `ATTrackingManager.requestTrackingAuthorization` will 
 By default, nearly all notices apply to ATT, meaning they are automatically opted-out when ATT is denied. The exception would be notices meant for informative purposes only, e.g. an "Essential" notice, which cannot be opted out of.
 
 Aside from essential notices, a standard notice can be configured with `att_exempt` so that the notice is unaffected when ATT is denied, and the toggles remain interactive. This is configured within the Admin-UI.
+
+### Minor Age Signal
+
+From 2027, California's Digital Age Assurance Act (AB 1043) has app stores tell each app the user's age bracket. Once an app has that signal, the CCPA treats it as knowing the user's age, so it may not sell or share the data of a user under 16 (which includes targeted advertising) without opt-in. Janus can apply this for you: when the user is under 16, it opts every targeted-ads notice out before it shows an experience or reports consent.
+
+#### Which notices it affects
+
+Janus uses the notice's existing **GPC flag** (`has_gpc_flag`). In California a GPC-flagged notice is a sale, sharing, or targeted-ads notice, which is exactly what the rule restricts. Notice-only notices are never affected. There is nothing new to configure in the Admin UI.
+
+#### How each bracket behaves
+
+| Bracket | Opted out automatically | Toggle in the Janus UI | Accept All | Opting back in |
+|---|---|---|---|---|
+| `.under13` | Yes | Locked while off | Leaves these notices out | Your app records a parent's consent with `setConsent(..., consentMethod: .parentalConsent)` |
+| `.age13To15` | Yes | Unlocked | Leaves these notices out | The user switches the individual toggle on |
+| `.age16To17`, `.adult`, `.unknown` | No | Normal | Normal | n/a |
+
+The opt-out does not count as the user's choice: it doesn't change the consent timestamps or method, so the experience still shows when it otherwise would. Janus opts each notice out **once**. It records which notices it has opted out, so a 13 to 15 year old who switches a notice back on keeps that choice across launches. When the bracket later moves to 16 or older, the toggles unlock, but Janus doesn't switch anything back on.
+
+The opt-out is saved to Fides with the consent method `age_signal` (when `saveUserPreferencesToFides` is on), and a parent's opt-in with `parental_consent`, so the consent report shows why each change happened. A Fides server too old to know these methods rejects them, so Janus retries that save once without a method. The bracket itself never leaves the device and is never stored: Janus keeps it in memory and stores only the list of notices it opted out.
+
+#### Source 1: Janus reads the age range from iOS
+
+Set `enableAgeSignal: true`. During initialization Janus calls Apple's Declared Age Range API (`AgeRangeService.shared.requestAgeRange(ageGates: 13, 16, 18, in:)`) and waits for the answer before its completion handler runs and before any automatic display.
+
+```swift
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    propertyId: "FDS-A0B1C2",
+    enableAgeSignal: true
+)
+```
+
+Three requirements:
+
+1. **Entitlement.** Add the Declared Age Range capability in Xcode, or add the key to your app's entitlements file. Janus cannot add it for you:
+
+   ```xml
+   <key>com.apple.developer.declared-age-range</key>
+   <true/>
+   ```
+
+2. **A visible screen.** iOS presents its own sheet over your top-most view controller. Initializing in `application(_:didFinishLaunchingWithOptions:)` is fine: if no screen is visible yet, Janus asks once the app becomes active, or when you call `showExperience(from:)`, using that view controller. It asks at most once per launch. Showing an experience, automatic or through `showExperience(from:)`, always waits for the answer. The initialize completion also waits for it, but if no screen appears within 5 seconds (for example, a launch in the background), it completes with the bracket still pending, and Janus applies the answer as soon as it arrives. If you pass a known bracket through `ageBracket` or `setAgeSignal`, Janus skips the prompt.
+3. **iOS 26 or later.** On older iOS, or when the user declines to share, the bracket is `.unknown` and initialization completes normally. Once Janus asks, it waits at most 5 seconds; an answer that arrives later is still applied when it comes in, including to an open experience. If iOS reports a range that spans 13 or 16, Janus uses the youngest bracket it covers.
+
+#### Source 2: your app passes the bracket
+
+If your app already requests the age range for its own content gating, pass the result to Janus instead, so the user doesn't see a second system prompt:
+
+```swift
+// At initialization: applied right after the experience loads, before it shows
+let config = JanusConfiguration(
+    apiHost: "https://privacy-plus.yourhost.com",
+    propertyId: "FDS-A0B1C2",
+    ageBracket: .age13To15
+)
+
+// Or later, when your app learns the bracket
+Janus.setAgeSignal(.age13To15)
+```
+
+When both sources are present, your app's bracket wins, because it may have information Janus lacks, such as a verified age. Passing `.unknown` hands the decision back to the iOS age range; with `enableAgeSignal` on, Janus asks iOS then if it hasn't yet this launch.
+
+#### Ordering when the bracket arrives after initialization
+
+`setAgeSignal` applies the bracket immediately, including to an open experience. However, Janus cannot close the gap before it arrives: with `autoShowExperience` on, the experience may already have shown, and ad SDKs may already have read consent. Because of this, an app that calls `setAgeSignal` after initialization should:
+
+1. Set `autoShowExperience: false`.
+2. Call `Janus.setAgeSignal(_:)` as soon as the bracket is known.
+3. Then show the experience with `Janus.showExperience(from:)` and start any ad SDKs.
+
+Likewise, create consent WebViews after the bracket is set, so each one starts with it.
+
+#### Parental consent for a child under 13
+
+Janus does not verify that a parent, rather than the child, gave consent. That check is your app's job. Once your app has it, record it:
+
+```swift
+Janus.setConsent(
+    values: ["data_sales_and_sharing": true],
+    consentMethod: .parentalConsent,
+    saveToFides: true
+)
+```
+
+Every other path (the Janus UI, Accept All, WebView updates, and `setConsent` with any other method) keeps an under-13 notice off. With `enableATT` on and tracking denied, the ATT lock still applies: a notice stays off if either lock applies.
+
+#### WebViews
+
+Managed WebViews, including the TCF experience, receive the bracket as the FidesJS `fides_age_signal` option in `fides_overrides`, set by the script Janus injects, and FidesJS applies the same locks. A bracket change reaches open WebViews through `window.Janus.updateFidesAgeSignal`. FidesJS reads this option only from overrides, never from URL parameters, so the page URL cannot change it.
+
+The bracket reaches FidesJS through `window.fides_overrides`, so any script on the page you load can read it. Don't load third-party scripts, such as ad or analytics tags, that read `fides_overrides` on pages you show in Janus WebViews. Janus keeps the bracket out of embedded frames, but it can't hide it from the page itself.
+
+Janus also checks consent that comes back from a WebView. For either minor bracket, a save from the page cannot switch on a restricted notice unless it is the user's own choice in the FidesJS modal: saving it, or a single notice's toggle. Everything else is turned back, including Accept All, a dismissed banner, a `fides_string`, the page's own `Fides.updateConsent` call, migrated consent, and GPC. An older FidesJS version therefore cannot bypass the rule, while a 13 to 15 year old's individual save in the FidesJS modal still goes through.
+
+A page's FidesJS saves its own consent to Fides, under the page's own `fides_user_device_id`. When Janus turns back an opt-in from a WebView (for example, one saved by an older FidesJS, or before the page knew the bracket), it also saves that correction to Fides with consent method `age_signal`, under the page's device ID, so the record the page wrote is overwritten. It is sent only when `saveUserPreferencesToFides` is on, from its own retry queue, which never replaces a pending save of your app's own consent. If the page saves again and keeps a notice on that Janus allows (a 13 to 15 year old's own choice), a correction for that notice that hasn't been sent yet is dropped.
+
+#### Your own WebViews
+
+If you show FidesJS in a WebView Janus doesn't manage, pass it the bracket yourself: set `fides_age_signal` in `window.fides_overrides` to `Janus.webViewAgeSignal?.rawValue` before FidesJS loads, and re-initialize FidesJS with the new value on `ageSignalUpdated`. `webViewAgeSignal` is the bracket Janus gives its own WebViews, or `nil` while the age signal is off. The event carries no bracket, so forwarding Janus events to analytics doesn't share it.
+
+```swift
+let listenerId = Janus.addConsentEventListener { event in
+    guard event.type == .AGE_SIGNAL_UPDATED else { return }
+    let signal = Janus.webViewAgeSignal?.rawValue  // nil: age signal off
+    // Pass `signal` to your page as fides_overrides.fides_age_signal
+}
+```
+
