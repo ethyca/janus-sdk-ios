@@ -14,7 +14,7 @@ Open Xcode > File > Add Packages… and add "https://github.com/ethyca/janus-sdk
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.4.1")
+    .package(url: "https://github.com/ethyca/janus-sdk-ios.git", from: "1.4.2")
 ]
 ```
 
@@ -24,7 +24,7 @@ JanusSDK isn't published to the CocoaPods trunk, so point CocoaPods at its podsp
 
 ```ruby
 target 'YourApp' do
-  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.4.1/JanusSDK.podspec'
+  pod 'JanusSDK', :podspec => 'https://raw.githubusercontent.com/ethyca/janus-sdk-ios/1.4.2/JanusSDK.podspec'
 end
 ```
 
@@ -37,17 +37,22 @@ The Janus SDK supports custom logging implementations through the `JanusLogger` 
 #### JanusLogger Protocol
 
 ```swift
-protocol JanusLogger {
-    func log(
-        level: JanusLogLevel,
-        message: String,
-        metadata: [String: String]?,
-        error: Error?
-    )
+public protocol JanusLogger {
+    func log(_ message: String, level: LogLevel, metadata: [String: String]?, error: Error?)
 }
 
-enum JanusLogLevel {
-    case verbose, debug, info, warn, error
+public enum LogLevel {
+    case verbose, debug, info, warning, error
+}
+```
+
+For example:
+
+```swift
+struct MyCustomJanusLogger: JanusLogger {
+    func log(_ message: String, level: LogLevel, metadata: [String: String]?, error: Error?) {
+        print("[Janus \(level)] \(message)")
+    }
 }
 ```
 
@@ -485,6 +490,8 @@ Aside from essential notices, a standard notice can be configured with `att_exem
 
 From 2027, California's Digital Age Assurance Act (AB 1043) has app stores tell each app the user's age bracket. Once an app has that signal, the CCPA treats it as knowing the user's age, so it may not sell or share the data of a user under 16 (which includes targeted advertising) without opt-in. Janus can apply this for you: when the user is under 16, it opts every targeted-ads notice out before it shows an experience or reports consent.
 
+**Requires Fides 3.3.0 or later.** With an older Fides server, Janus still applies the age signal on the device, but Fides saves its opt-outs without the `age_signal` and `parental_consent` reasons, and the FidesJS in your WebViews doesn't apply the bracket itself (Janus still turns back any opt-in those pages try to save).
+
 #### Which notices it affects
 
 Janus uses the notice's existing **GPC flag** (`has_gpc_flag`). In California a GPC-flagged notice is a sale, sharing, or targeted-ads notice, which is exactly what the rule restricts. Notice-only notices are never affected. There is nothing new to configure in the Admin UI.
@@ -523,7 +530,7 @@ Three requirements:
    ```
 
 2. **A visible screen.** iOS presents its own sheet over your top-most view controller. Initializing in `application(_:didFinishLaunchingWithOptions:)` is fine: if no screen is visible yet, Janus asks once the app becomes active, or when you call `showExperience(from:)`, using that view controller. It asks at most once per launch. Showing an experience, automatic or through `showExperience(from:)`, always waits for the answer. The initialize completion also waits for it, but if no screen appears within 5 seconds (for example, a launch in the background), it completes with the bracket still pending, and Janus applies the answer as soon as it arrives. If you pass a known bracket through `ageBracket` or `setAgeSignal`, Janus skips the prompt.
-3. **iOS 26 or later.** On older iOS, or when the user declines to share, the bracket is `.unknown` and initialization completes normally. Once Janus asks, it waits at most 5 seconds; an answer that arrives later is still applied when it comes in, including to an open experience. If iOS reports a range that spans 13 or 16, Janus uses the youngest bracket it covers.
+3. **iOS 26 or later.** On older iOS, or when the user declines to share, the bracket is `.unknown` and initialization completes normally. Once Janus asks, it waits at most 5 seconds, or, while Apple's sheet is on screen, until the user answers it (at most 1 minute); an answer that arrives later is still applied when it comes in, including to an open experience. If iOS reports a range that spans 13 or 16, Janus uses the youngest bracket it covers.
 
 #### Source 2: your app passes the bracket
 
